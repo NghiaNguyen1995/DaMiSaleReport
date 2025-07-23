@@ -1,0 +1,78 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.damisalereport"
+     xmlns:tools="http://schemas.android.com/tools">
+
+        <!-- Kết nối Internet -->
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+        <!-- Đọc ảnh từ bộ nhớ -->
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+        <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+        <!-- Camera (cho QR code, chụp ảnh) -->
+        <uses-permission android:name="android.permission.CAMERA" />
+
+        <!-- Micro (cho voice/ghi âm) -->
+        <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+        <!-- Định vị (cho geolocation, Google Maps, v.v.) -->
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+        <!-- Nhận thông báo push (Firebase) -->
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+        <!-- Safe Area, Orientation Locker, v.v. không cần quyền riêng -->
+
+        <!-- Nếu dùng chức năng xem file PDF hoặc Excel ngoài app -->
+        <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+
+
+    <application
+        android:name=".MainApplication"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:theme="@style/AppTheme"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        tools:replace="android:appComponentFactory">
+        <meta-data
+                android:name="com.google.android.gms.wallet.api.enabled"
+                android:value="true" />
+        <meta-data 
+                android:name="com.google.android.gms.version" 
+                android:value="@integer/google_play_services_version" />
+                
+        <meta-data
+                android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+                android:value="ocr" />
+        <uses-library
+                android:name="org.apache.http.legacy"
+                android:required="false" />
+        <activity
+                android:name=".MainActivity"
+                android:label="@string/app_name"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+                android:launchMode="singleTask"
+                android:windowSoftInputMode="adjustNothing"
+                android:exported="true"
+                android:screenOrientation="portrait"
+                android:requestLegacyExternalStorage="true"
+                >
+                <!--<android:screenOrientation="portrait">-->
+                
+                <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                </intent-filter>
+        </activity>
+    </application>
+</manifest>

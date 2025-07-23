@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "586957250398",
+    "project_id": "damisoftware-d620b",
+    "storage_bucket": "damisoftware-d620b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586957250398:android:fb95d0c8bc4df34e5939cf",
+        "android_client_info": {
+          "package_name": "com.dami_khoductung"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc9flwL3M0jWhvRMZboEN4mnHyJoMrz9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586957250398:android:52103b3b0eb59df85939cf",
+        "android_client_info": {
+          "package_name": "com.damisalereport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc9flwL3M0jWhvRMZboEN4mnHyJoMrz9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
