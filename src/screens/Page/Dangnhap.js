@@ -200,7 +200,7 @@ export default function Login({ navigation }) {
         return (
           <View style={{ flex: 1}}>
             <StatusBar barStyle='light-content' />
-            <View style={{ width: '100%', height: '100%',alignItems: 'center', justifyContent: 'center',alignSelf:'center',paddingTop:30}}>
+            <View style={{ width: '100%', height: '100%',alignItems: 'center', justifyContent: 'center',alignSelf:'center',marginTop:15}}>
                   <TouchableOpacity onPress={()=>{fSetImage()}}>
                     <Image  source={urlImage ? { uri: urlImage } : icons.logoDami}
                             style={{ width: 280, height: 150 }} />
@@ -296,7 +296,7 @@ export default function Login({ navigation }) {
 
         return (
 
-          <View style={{...containerInput.ctnInput,height:'100%',marginTop:25,alignItems:'center'}}>
+          <View style={{...containerInput.ctnInput,height:'100%',marginTop:50,alignItems:'center'}}>
             
             
             <View style={{ ...containerInput.viewItem,width:'90%'}}>

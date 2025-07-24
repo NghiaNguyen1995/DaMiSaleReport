@@ -13,6 +13,7 @@ import { FunctionViewThongBao } from "../Function/Chung/functionViewThongBao";
 import { SetNgayGio } from "../Function/Chung/functionGetDate";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
 const windowWidth = Dimensions.get('window').width;
 
 export const TrangChu = ({navigation,route}) => {
@@ -97,28 +98,25 @@ export const TrangChu = ({navigation,route}) => {
     const featuresData = [
         {
             id: 'baocaotonkho',
-            icon: icons.report_bucket, 
-            //icon: icons.bucket_animated,          
+            icon: icons.report_warehouse, 
+            //color: COLORS.brown,       
             description: "BÁO CÁO\nTỒN KHO"
         }, 
         { 
             id: 'baocaocongno',
-            icon: icons.report_todolist,
+            icon: icons.report_debt,
             //color: COLORS.purple,
-            //backgroundColor: COLORS.lightpurple,
             description: "BÁO CÁO\nCÔNG NỢ"
         },
         { 
             id: 'phieugiaohang',
-            icon: icons.dexuat,
-            //color: COLORS.purple,
-            //backgroundColor: COLORS.lightpurple,
+            icon: icons.report_delivery,
+            //color: COLORS.yellow,
             description: "PHIẾU\nGIAO HÀNG"
         },{ 
             id: 'doanhthubanhang',
-            icon: icons.doanhthubanhang,
-            //color: COLORS.purple,
-            //backgroundColor: COLORS.lightpurple,
+            icon: icons.report_doanhthubanhang,
+            //color: COLORS.blue,
             description: "DOANH THU\nBÁN HÀNG"
         }
     ]
@@ -236,7 +234,7 @@ export const TrangChu = ({navigation,route}) => {
                        
                         style={{
                             height: 50,            
-                            tintColor: COLORS.darkgray//item.color
+                            tintColor: item.color
                         }}
                     />
                 </View>

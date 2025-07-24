@@ -19,6 +19,7 @@ import com.zoontek.rnpermissions.RNPermissionsPackage;
 //import com.reactnativegooglesignin.RNGoogleSigninPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+//import com.facebook.drawee.backends.pipeline.Fresco;
 
 class MainApplication : Application(), ReactApplication {
 
@@ -43,6 +44,7 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    //Fresco.initialize(this); // ✅ Gọi để khởi tạo Fresco
     loadReactNative(this)
   }
 }

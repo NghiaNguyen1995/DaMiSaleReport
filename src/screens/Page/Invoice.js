@@ -221,7 +221,6 @@ export default function Invoice({navigation,route}) {
             <View style={{...containerInput.ctnInput, paddingTop:5}}>
                 
                 {/* Hai textInput của Nhập số phiếu và nhập tên khách hàng */}
-                
                 <View style={{flexDirection:'row',alignItems:'center', gap: 15}}>
                         
                         <View style={{...containerInput.viewItem, width:'48%', height:50}}>
@@ -246,12 +245,13 @@ export default function Invoice({navigation,route}) {
                                 onChangeText={(text) => setlocalvCustumer(text)}
                             />
                         </View>
+
                 </View>
            
                 {/* Gồm 3 nút: Lịch, nhân viên, nạp dữ liệu */}
-                <View style={{flexDirection:'row',alignItems:'center', gap: 10}}>
+                <View style={{flexDirection:'row',alignItems:'center', gap: 5}}>
         
-                    <View style={{...containerInput.viewItem, width:'32%', height:50, alignItems:'center'}}>
+                    <View style={{...containerInput.viewItem, width:'30%', height:50, alignItems:'center'}}>
                         <TouchableOpacity 
                             onPress={() => {
                                 setvVoucher(localvVoucher);
@@ -269,12 +269,12 @@ export default function Invoice({navigation,route}) {
                                     style={{tintColor:COLORS.lime, height:20, width:20}}
                                 />  
                                 <Text style={{...containerInput.textInput, marginLeft:10}}>
-                                    {dVoucher!=''?moment(dVoucher).format('DD/MM/YYYY'):'Chọn ngày'}
+                                    {dVoucher!=''?moment(dVoucher).format('DD/MM/YY'):'Chọn ngày'}
                                 </Text>
                         </TouchableOpacity>
                     </View>
           
-                    <View style={{width:'35%'}}>
+                    <View style={{width:'37%'}}>
                         <ViewDroppoxStaff 
                             vStaff={vStaff}
                             setvStaff={setvStaff}
@@ -294,7 +294,7 @@ export default function Invoice({navigation,route}) {
                             }
                             fNapdulieu(localvVoucher, localvCustumer);
                         }} 
-                        style={{...containerInput.buttonOK, marginTop:10, width:'28%',height:50}}>
+                        style={{...containerInput.buttonOK, marginTop:10, width:'30%',height:50}}>
                             <Text style={containerInput.buttonText}>Nạp dữ liệu</Text> 
                     </TouchableOpacity>
                 </View>

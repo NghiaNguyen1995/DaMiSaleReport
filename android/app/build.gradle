@@ -134,8 +134,8 @@ dependencies {
     implementation 'androidx.core:core:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
 
-    implementation 'com.facebook.fresco:fresco:2.5.0' // Sử dụng cho ảnh gif
-    implementation 'com.facebook.fresco:animated-gif:2.5.0' // Sử dụng cho ảnh gif
+    //implementation 'com.facebook.fresco:fresco:2.5.0' // Sử dụng cho ảnh gif
+    //implementation 'com.facebook.fresco:animated-gif:2.5.0' // Sử dụng cho ảnh gif
 
 
     if (hermesEnabled.toBoolean()) {

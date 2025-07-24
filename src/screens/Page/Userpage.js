@@ -57,7 +57,7 @@ export default function UserScreen({navigation,route}) {
     // Set dữ liệu ban đầu
     const setDuLieu = async()=>{
 
-        setmanhanvien(route.params?.UserName.toUpperCase())
+        setmanhanvien(route.params?.ID.toUpperCase())
         settennhanvien(route.params?.UserName.toUpperCase())
 
         //set ảnh:

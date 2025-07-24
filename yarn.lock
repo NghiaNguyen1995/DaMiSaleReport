@@ -4842,11 +4842,6 @@ expo-constants@~17.1.7:
     "@expo/config" "~11.0.12"
     "@expo/env" "~1.0.7"
 
-expo-document-picker@~13.1.6:
-  version "13.1.6"
-  resolved "https://registry.yarnpkg.com/expo-document-picker/-/expo-document-picker-13.1.6.tgz#d31a14eac7f0d44f6d1eee8d41403499ce07924d"
-  integrity sha512-8FTQPDOkyCvFN/i4xyqzH7ELW4AsB6B3XBZQjn1FEdqpozo6rpNJRr7sWFU/93WrLgA9FJEKpKbyr6XxczK6BA==
-
 expo-file-system@~18.1.11:
   version "18.1.11"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-18.1.11.tgz#a563c715c4bb5c18729d6d104e8c6cdfbd383e69"
@@ -7713,6 +7708,11 @@ react-native-gesture-handler@^2.27.1:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
+
+react-native-gif@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-gif/-/react-native-gif-1.0.3.tgz#3d3e5347df3dc352e926c3dc9d83a2599c9e138c"
+  integrity sha512-UXeT8Gyff0ksCTiRYNZ3DqykevG1vZUQLi7oe9pB7yS4nSlMn11w22/nOcNCpHuZsaod86+xPi1MSxtNkFNJ5g==
 
 react-native-google-drive-api-wrapper@^1.4.0:
   version "1.4.0"
