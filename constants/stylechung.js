@@ -667,15 +667,30 @@ export function fSetTextAlignForText(key){
         return 'right';
     }
 }
-
+//115 + 50 + 115 = 280
 export function fSetWidthRowFlatListItem(key){
-    if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('VoucherNo')||key.includes('NoteDetails')){
-        return 115;
+    if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('NoteDetails')){
+        return 100//return 115;
     }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('UnitName')){
-        return 50;
+        return 60//return 50;
+    }else if(key.includes('Date')||key.includes('VoucherNo')){
+        return 98
     }
     else{
-        return 115;
+        return 120//return 115;
     }
 }
 //#endregion
+
+
+/*
+ItemID: "Mã hàng", ItemName: "Tên hàng", UnitName: "ĐVT", WareHouseID: "Kho", BegInvQuantity: "Tồn đầu (kg)", BegInvQuantity2: "Tồn đầu (cây)", InQuantity: "Nhập (kg)",
+InQuantity2: "Nhập (cây)", OutQuantity: "Xuất (kg)", OutQuantity2: "Xuất (cây)", EndInvQuantity: "Tồn cuối (kg)", EndInvQuantity2: "Tồn cuối (cây)", AccountID: "Mã TK",
+CustomerName: "Tên\nkhách hàng", TradeName: "Tên\nkhách hàng", TaxCode: "Mã số thuế", CnvBegDebit: "Phải thu\nđầu kỳ", CnvBegCredit: "Phải trả\nđầu kỳ", 
+CnvDebit: "Phải thu\ntrong kỳ", CnvCredit: "Phải trả\ntrong kỳ", CnvEndDebit: "Phải thu\ncuối kỳ",  CnvEndCredit: "Phải trả\ncuối kỳ", RowNumber: "STT", VoucherDate: "Ngày",
+VoucherNo: "Số phiếu", Description: "Diễn giải", InvoiceNo: "Số\nhóa đơn", InvoiceDate: "Ngày\nhóa đơn", SerialNo: "Số serial", PaymentMethodName: "Phương thức\nthanh toán",
+CustomerID: "Mã\nkhách hàng", Address1: "Địa chỉ", ItemColor: "Màu sắc", Specification: "Quy cách", Quantity: "Số lượng", Quantity2: "Số lượng phụ", QtyCay: "Số cây",
+QtyMet: "Số mét", ConvertPrice: "Đơn giá", ConvertPrice2: "Đơn giá quy đổi phụ", CnvPriceCay: "Đơn giá theo cây", CnvPriceMet: "Đơn giá theo mét", ConvertAmount: "Thành tiền",
+NoteDetails: "Ghi chú", PrepairedByName: "Người bán", Transactor: "Người giao dịch", TranAddress: "Địa chỉ giao dịch", AttachDocInfo: "Thông tin tài liệu đính kèm",
+Notes: "Ghi chú", SalesManID: "Mã NV", SalesManName: "Tên NV", ItemGroupID: "Mã\nnhóm hàng",
+*/

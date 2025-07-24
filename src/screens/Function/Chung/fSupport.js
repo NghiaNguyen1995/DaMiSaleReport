@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 export class clsFunc {
+
   // Format dữ liệu từng dòng
   static fFormatDataItem(key, item) {
     if (key.includes('Quantity') || key.includes('Debit') || key.includes('Credit') || key.includes('ConvertPrice') || key.includes('ConvertAmount')) {
@@ -105,7 +106,10 @@ export class clsFunc {
       Transactor: "Người giao dịch",
       TranAddress: "Địa chỉ giao dịch",
       AttachDocInfo: "Thông tin tài liệu đính kèm",
-      Notes: "Ghi chú"
+      Notes: "Ghi chú",
+      SalesManID: "Mã NV",
+      SalesManName: "Tên NV",
+      ItemGroupID: "Mã\nnhóm hàng",
     };
     return mapping[key] || key;
   }
@@ -139,7 +143,7 @@ export class clsFunc {
         })),
         {
           label: 'Không chọn',
-          value: ''
+          value: null
         }
       ];
 
@@ -184,9 +188,15 @@ export class clsFunc {
       }else{
         return item[key];
       }
+    }else if(id === 'doanhthubanhang'){
+      if(key=="SalesManName"){
+        return item['SalesManName']='TỔNG CỘNG';
+      }else{
+        return item[key];
+      }
     }else{
       if(key=="ItemName" || key=="TradeName"){
-            return item[key]='TỔNG CỘNG';
+            return item[key]='TỔNG CỘNG';``
       }else{
               return item[key];
       }

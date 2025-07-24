@@ -1,105 +1,36 @@
 import React,{useState,useRef} from 'react'
 import {View,StyleSheet,Text,Dimensions,Modal,
 TextInput,TouchableOpacity,Image, KeyboardAvoidingView,FlatList,ActivityIndicator} from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import {DrawerItem} from '@react-navigation/drawer'
 import {Avatar,Drawer} from 'react-native-paper'
-import Icon  from 'react-native-vector-icons/MaterialCommunityIcons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect } from 'react'
-import CheckBox from 'react-native-check-box';
 import { icons } from "../../../constants"
 import {FunctionViewThongBao} from '../Function/Chung/functionViewThongBao';
 import { NameScreen } from '../../../constants/NameScreen';
-import { HeaderStyle,containerView,flatlistViewTitle,flatlistViewSupTitle,containerInput, ModalStyle } from '../../../constants/stylechung';
-import { object } from '../../../constants/theme';
-import storage from '@react-native-firebase/storage';
-import firestore from "@react-native-firebase/firestore"
-import Clipboard from '@react-native-clipboard/clipboard';
-import { GetDevice } from '../Function/Chung/functionInfoDevice';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { pick, types } from '@react-native-documents/picker';
+import RNFS from 'react-native-fs';
+import { ViewLoadingAnimation } from '../Function/fViewLoading'
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function UserScreen({navigation,route}) {
-    
-    const [taikhoan,settaikhoan]= useState("")
-    const [mnv,setmnv]=useState("")
-    const inputmnv=useRef(null)
-    const [tennv,settennv]=useState("")
-    const inputtennv=useRef(null)
-    const [phone,setphone] = useState('')
-    const inputphone=useRef(null)
-    const [pw,setpw] = useState('')
-    const [emailreceive,setemailreceive]=("")
-    const [actionType,setactionType] = useState('')
-    const [danhsachuser,setdanhsachuser]= useState([])
-    const [danhsachuserfirebase,setdanhsachuserfirebase]= useState([])
+
 
     const [manhanvien,setmanhanvien] = useState('')
     const [tennhanvien,settennhanvien] = useState('')
 
-    const [chucvu,setchucvu] = useState('')
-    const [phongban,setphongban] = useState('')
-    const [tencongty,settencongty] = useState('')
+   
     const [anh,setanh] = useState(null)
    
     const [isDarkTheme,setIsDarkTheme]= React.useState(false);
     const [visible,setVisible]= useState(false);
 
-    const [UserDel,setUserDel]= useState('');
-    const [visibleXoaUser,setvisibleXoaUser]= useState(false);
-
+   
     const [modalthongbao,setmodalthongbao] = useState(false)
     const [loaithongbao,setloaithongbao] = useState('')
 
-    const [selectedItem,setSelectedItem] = useState("")
-
   
-    const LaydulieuDemo = async() => {
-        
-        if(dulieudemo==false){
-          setVisible(true)
-
-          //Id thư mục lấy từ file JSON đối với tài khoản chưa đăng ký || nhấn nút xem dữ liệu Demo
-          let idthumuc = await AsyncStorage.getItem("idthumuc")
-          
-          if(idthumuc!=null){
-            let listfile = await _getAllMyAppFilesList_myFolder(idthumuc,"")
-          
-            for(let i = 0;i<listfile.length;i++){
-              //Hàm đọc File JSON
-              const fileContent = await getContentFile(listfile[i].id);
-              if (fileContent) {
-                if (listfile[i].name === "danhsachduan.json") {
-                  console.log("danhsachduan: ",listfile[i]) 
-                  AsyncStorage.setItem('fileduan',JSON.stringify(listfile[i]))
-                } else if (listfile[i].name === "canhbaocongviec.json") {
-                   console.log("canhbaocongviec: ",listfile[i])    
-                  AsyncStorage.setItem('filecongviec',JSON.stringify(listfile[i]))
-                } else if(listfile[i].name === "canhbaohopdong.json"){
-                  console.log("canhbaohopdong: ",listfile[i])
-                  AsyncStorage.setItem('filehopdong',JSON.stringify(listfile[i]))
-                }
-              }
-            } 
-            setdulieudemo(!dulieudemo)
-            setVisible(false)       
-            navigation.navigate(NameScreen.DuanDrive)
-          }else{
-            setVisible(false)
-          }         
-        }else{
-          setloaithongbao("Datademo")
-          setmodalthongbao(true)
-          if(modalthongbao==false){ 
-            navigation.navigate(NameScreen.DuanDrive)
-          }
-          
-        }
-        
-    };
-
     const Dangxuat = ()=>{
       navigation.navigate(NameScreen.Login)
     }
@@ -126,398 +57,15 @@ export default function UserScreen({navigation,route}) {
     // Set dữ liệu ban đầu
     const setDuLieu = async()=>{
 
-        setmanhanvien(route.params?.manv.toUpperCase())
-        settennhanvien(route.params?.hoten.toUpperCase())
+        setmanhanvien(route.params?.UserName.toUpperCase())
+        settennhanvien(route.params?.UserName.toUpperCase())
 
         //set ảnh:
-        let imageurl = await AsyncStorage.getItem("imageurl")
-        console.log("imageurl",imageurl)
-        if(imageurl!=null){
-          setanh(imageurl)
-        }else{
-          return null
+        let anhdaidien = await AsyncStorage.getItem("anhdaidien")
+        console.log("anhdaidien",anhdaidien)
+        if(anhdaidien){
+          setanh(anhdaidien)
         }
-    }
-
-    // Tải file lên Storage
-    const UpToStorage = async()=>{
-      try {
-        const res = await DocumentPicker.pick({
-          type: [DocumentPicker.types.allFiles],
-        });
-    
-        // Read the file as base64 using RNFS
-        //const fileData = await RNFS.readFile(res[0].uri, 'base64');
-    
-        // Upload the file to Firebase Storage
-        await storage().ref('duongdan.json').putFile(res[0].uri);
-    
-        console.log('File uploaded successfully');
-      } catch (error) {
-        console.log('Error picking or uploading the file:', error);
-      }
-    }
-    
-    const getRandomPassword = () => {
-      //const letters = '0123456789abcdefghjklmnopkrwxyz';
-      const letters = '0123456789';
-      let pw = "";
-      for (let i = 0; i < 4; i++) {
-        //pw += letters[Math.floor(Math.random() * 16)];
-        pw += letters[Math.floor(Math.random() * 10)]; // Changed 16 to 10 to ensure random selection from 0-9
-      }
-      //if(UserDel!=''){
-        //Clipboard.setString(`USERNAME: ${UserDel.toUpperCase()}, PASSWORD: ${pw}`)
-      //}else{
-        //Clipboard.setString(`TK: ${taikhoan.toUpperCase()} / MK: ${pw}`)
-      //}
-      console.log(`Mật khẩu: ${pw}`)  
-      setpw(pw)    
-      return pw;
-    };
-    
-    //Chức nay đăng ký Tài Khoản vào firestore Database
-    const dangkyFirebase = async()=>{
-      
-      //let foundMatch = false;
-
-      //Đang xài giành cho chọn trong List: 09012024
-      //let emailchoose = taikhoan.USERNAME.toUpperCase()
-
-      //let emailchoose = taikhoan.toUpperCase()
-      let emailchoose = mnv.toUpperCase()
-      await firestore()
-            .collection('token-user').doc(emailchoose)
-            .set({
-              'lastlogin':'',
-              'hoten':tennv.trim(),
-              'phone': phone,          
-              'pw': pw,//getRandomPassword(),
-              'token': '',
-            })
-            .then(() => {
-              Clipboard.setString(`TK: ${mnv.toUpperCase()} / MK: ${pw}`)
-              let Danhsachuserfirebase = []
-              fetchDanhSachUserFirestore(Danhsachuserfirebase) 
-              setmnv('') //mã nhân viên
-              settennv('')
-              setpw('') // password
-              setphone('') //điện thoại    
-              setSelectedItem('') 
-              setVisible(false)
-              //setloaithongbao('UserAdd')
-              //setmodalthongbao(true)
-              
-            });
-    }
-   
-    //Tìm user khi nhập vào TextInput và trả về tên đơn vị nếu tìm thấy
-    const findUserInput = ()=>{
-      let emailchoose = taikhoan.toUpperCase()
-      for(let i=0;i<danhsachuser.length;i++){
-        if(emailchoose==danhsachuser[i].USERNAME){  
-          return danhsachuser[i].TENCONGTY
-        }
-      }
-      
-    }
- 
-    //Modal Thêm Tài Khoản
-    const ViewModalThemUser = ()=>{
-
-      const xettieude =()=>{
-        if(actionType=='adduser'){
-          return "Thêm người dùng"
-        }else{
-          return "Cập nhật thông tin"
-        }
-      }
-
-      return(  
-      <Modal visible={visible} animationType="fade" transparent={true}>
-        <KeyboardAvoidingView behavior='position'>
-          <View style={{...ModalStyle.Modal,marginTop:150}}>     
-            <View style={{//borderColor:'#8B4513',borderWidth: 2
-            backgroundColor:'white'}}>   
-              
-                <View style={{...HeaderStyle.hearderTrangBaoCaoDuAn,justifyContent:'center'}}>
-                    <Text style={{...object.labelTitle}}>{xettieude()}</Text>
-                </View>
-                
-                {/* Mã nhân viên */}
-                <View style={{...containerInput.viewItem}}>
-                  <Text style={{...containerInput.textLabel}}>Tài khoản:</Text>
-               
-                  {/*<DropDownList 
-                    value={selectedItem}
-                    data={danhsachuser}
-                    onSelect={onSelect}
-                  /> - Đang xài: 09012024*/}
-
-                  {<TextInput 
-                  ref={inputmnv}
-                  style={{...containerInput.textLabel,width:windowWidth*0.68,paddingTop:-3}}
-                  placeholder=""
-                  value={mnv}
-                  onChangeText={text => {setmnv(text)}}
-                  onSubmitEditing={()=>{inputtennv.current.focus()}}
-                  editable={actionType=="adduser"?true:false}
-                  />}
-                  {<Icon 
-                      name="star"
-                      size={15}
-                      style={{position: 'absolute',top: -10,right: -5,color:'red',zIndex:1}}
-                    />
-                  }
-                </View>
-
-                {/* Họ tên */}
-                <View style={{...containerInput.viewItem}}>
-                  <Text style={{...containerInput.textLabel}}>Họ tên:</Text>
-               
-                  {<TextInput 
-                  ref={inputtennv}
-                  style={{...containerInput.textLabel, width:windowWidth*0.73,paddingTop:-3}}
-                  placeholder=""
-                  value={tennv}
-                  onChangeText={text => {settennv(text)}}
-                  onSubmitEditing={()=>{inputphone.current.focus()}}
-                  />}
-                  
-                </View>
-
-                {/* Số điện thoại */}
-                <View style={{...containerInput.viewItem}}>
-                {<Text style={{...containerInput.textLabel}}>Mã thiết bị:</Text>
-                }
-                <TextInput 
-                ref={inputphone}
-                style={{...containerInput.textLabel, width:windowWidth*0.65,paddingTop:-3}}
-                //multiline={true}
-                placeholder=""
-                keyboardType="numeric"
-                value={phone}
-                onChangeText={text => {setphone(text)}}
-                onSubmitEditing={()=>{
-                  if(mnv.trim()!=""){
-                    dangkyFirebase()
-                  }else{
-                    inputmnv.current.focus()
-                  }
-                }}
-                />
-                {/*<Icon 
-                  name="star"
-                  size={15}
-                  style={{position: 'absolute',top: -10,right: -5,color:'red',zIndex:1}}
-                />*/}
-                </View>
-
-                {/* Mã đăng ký */}
-                <View style={{...containerInput.viewItem,alignItems:'center',justifyContent:'space-between'}}>
-                    <Text style={{...containerInput.textLabel}}>Mã đăng ký:   {pw}</Text>
-                
-            
-
-                    <TouchableOpacity onPress={()=>{getRandomPassword()}}>
-                      <Image
-                        source={icons.resetpw} 
-                        style={{height:23,width:23,tintColor:'black' ,marginTop:3,marginRight:5}}
-                      />
-                    </TouchableOpacity>
-                  {/*<TextInput style={{...style1.text1,marginTop:-7,marginLeft:0, width:windowWidth*0.67}}
-                  //multiline={true}
-                  placeholder=""
-                  value={pw}
-                  onChangeText={text => {setpw(text)}}
-                  editable={false}
-                  />*/}
-                  {/*<Icon 
-                    name="star"
-                    size={15}
-                    style={{position: 'absolute',top: -10,right: -5,color:'red',zIndex:1}}
-                  />*/}
-                  
-                </View>
-                
-                {/* Button */}
-                <View style={{...containerInput.viewButton,marginBottom:15,marginTop:15}}>
-                  <TouchableOpacity
-                    style={{...containerInput.buttonCancle,marginLeft:10}}
-                    onPress={() => {setVisible(false),setmnv(''),settennv(''),setSelectedItem(''),setpw(''),setphone('')}}
-                  >
-                    <Text style={{...containerInput.buttonText}}>Hủy</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{...containerInput.buttonOK,marginRight:10}}
-                    onPress={() => { 
-                      if(/*phone.trim()==''||token.trim()==''||*/mnv.trim()==''){
-                        setloaithongbao('NodataInput')
-                        setmodalthongbao(true)
-                       //setSelectedItem('')
-                      }else{
-                        dangkyFirebase()
-                      }
-                    }}
-                  >
-                    <Text style={{...containerInput.buttonText}}>Cập nhật</Text>
-                  </TouchableOpacity>
-                </View>
-
-            </View>
-          {/*</ImageBackground>*/}
-          
-          
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>    
-      )
-    }
-
-    // View Xoá hoặc reset mật khẩu
-    const ViewActionType = ()=>{
-
-      const xetTieude=()=>{
-        if(actionType=="DELETE"){
-          return "Xoá dữ liệu"
-        }else if(actionType=="RESET"){
-          return "Điều chỉnh"
-        }
-        //return "Xoá dữ liệu";
-      }
-
-      const xetNoidung=()=>{
-        if(actionType=="DELETE"){
-          return `Tài khoản:   ${UserDel} ?`
-        }else if(actionType=="RESET"){
-          return `Cấp mật khẩu mới cho tài khoản: ${UserDel} ?`
-        }
-      }
-      
-      return(  
-      <Modal visible={visibleXoaUser} animationType="fade" transparent={true}>
-        <KeyboardAvoidingView behavior='position'>
-          <View style={{...ModalStyle.Modal,marginTop:270}}>     
-            <View style={{//borderColor:'#8B4513',borderWidth: 2
-            backgroundColor:'white'}}>   
-              
-                <View style={{...HeaderStyle.hearderTrangBaoCaoDuAn,justifyContent:'center'}}>
-                    <Text style={{...object.labelTitle}}>{xetTieude()}</Text>
-                </View>
-
-                <View style={{alignItems:'center'}}>
-                  <Text style={{...containerInput.textLabel}}>{xetNoidung()}</Text>
-                </View>
-                {/* Button */}
-                <View style={{...containerInput.viewButton,marginTop:15,marginBottom:15}}>
-                  <TouchableOpacity
-                    style={{...containerInput.buttonCancle,marginLeft:15}}
-                    onPress={() => {setvisibleXoaUser(false)}}
-                  >
-                    <Text style={{...containerInput.buttonText}}>Huỷ</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{...containerInput.buttonOK,marginRight:15}}
-                    onPress={() => { 
-                      if(actionType=="DELETE"){
-                        del()
-                      }else if(actionType=="RESET"){
-                        reset()
-                      }
-                      setvisibleXoaUser(false) 
-                    }}
-                  >
-                    <Text style={{...containerInput.buttonText}}>Cập nhật</Text>
-                  </TouchableOpacity>
-                </View>
-
-            </View>
-          {/*</ImageBackground>*/}
-          
-          
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>    
-      )
-    }
-
-    //Chức năng chọn Tài khoản từ danhsachuser
-    const onSelect = (item) => {
-      setSelectedItem(item)
-      settaikhoan(item)
-    }
-    
-    //Xoá user trong list token-user trong firestore
-    const del=()=>{
-      firestore().collection('token-user').doc(UserDel).delete().then(()=>{
-        let Danhsachuserfirebase = []
-        fetchDanhSachUserFirestore(Danhsachuserfirebase)
-        setUserDel('')
-      })
-    }
-
-    //Reset mật khẩu user trong list token-user trong firestore
-    const reset=()=>{
-      firestore().collection('token-user').doc(UserDel).update({
-        'pw': getRandomPassword(),
-        'newpw':''
-      }).then(()=>{
-        //sendmail()  
-        let Danhsachuserfirebase = []
-        fetchDanhSachUserFirestore(Danhsachuserfirebase)
-        setUserDel('')
-      })
-    }
-
-    //Function lấy danh sách user trong firestore
-    const fetchDanhSachUserFirestore = async(Danhsachuserfirebase)=>{
-      await firestore().collection('token-user').get().then(querySnapshot =>{
-        
-        querySnapshot.forEach(documentSnapshot => {
-          //console.log('data: ',documentSnapshot.data())      
-          if(documentSnapshot.id!="ADMIN"){
-            Danhsachuserfirebase.push({
-              id: documentSnapshot.id,
-              hoten: documentSnapshot.data().hoten,
-              phone: documentSnapshot.data().phone,
-              pw: documentSnapshot.data().pw
-            })  
-          }    
-        });
-        console.log('Danh sách tài khoản Firebase: ',Danhsachuserfirebase)
-        setdanhsachuserfirebase(Danhsachuserfirebase)
-      })
-    }
-
-
-    const MarginTopByDevice =()=>{
-      let device = GetDevice()
-      // Kiểm tra nếu model là từ iPhone X trở lên
-      if (device.includes('X') || device.includes('11') || device.includes('12') || device.includes('13')|| device.includes('14')|| device.includes('15')) {
-         return ({
-              marginTop:30
-         })
-      } else {
-          return ({
-              marginTop:0
-          })
-      }
-    }
-
-    const checkquanly=()=>{
-      if(taikhoan!=null&&taikhoan.isquanly==true){
-        return (
-          <View style={{flexDirection:'row'}}>
-            <Text style={{fontSize: 15,color:'#4F4F4F',paddingTop:5}}>Quyền quản lý:</Text>
-            <CheckBox
-                  isChecked={taikhoan.isquanly}
-                  disabled ={false}
-                  onClick={()=>{}}
-                  style={{ fontSize: 15,marginLeft: 20,paddingTop:3}}
-            />
-          </View>
-        )
-      }
     }
 
     const styles = StyleSheet.create({
@@ -656,51 +204,53 @@ export default function UserScreen({navigation,route}) {
     });
 
     //Chức năng chọn ảnh đại diện
-    const selectImage = async () => {
-      try {
-        const res = await DocumentPicker.pick({
-          type: [DocumentPicker.types.images],
-        });
-        console.log(res[0].uri)
-        setanh(res[0].uri);
-        AsyncStorage.setItem("imageurl",res[0].uri)
-      } catch (err) {
-        if (DocumentPicker.isCancel(err)) {
-          console.log('User cancelled the picker');
-        } else {
-          console.log('Error: ', err);
+    async function fSetImage() {
+        try {
+          const results = await pick({
+            types: [types.images],
+            allowMultiSelection: false,
+            copyToCacheDirectory: false,
+          });
+
+          const res = results[0];
+
+          if (!res || !res.uri) {
+            console.log('Không chọn ảnh nào');
+            return;
+          }
+
+          // Lấy extension file
+          const ext = res.name?.split('.').pop() || 'jpg';
+          const destPath = `${RNFS.CachesDirectoryPath}/${Date.now()}.${ext}`;
+
+          // Copy từ content:// sang cache folder
+          await RNFS.copyFile(res.uri, destPath);
+
+          const fileUri = `file://${destPath}`;
+          console.log('Copied file to:', fileUri);
+
+          setanh(fileUri);
+          await AsyncStorage.setItem('anhdaidien', fileUri);
+        } catch (err) {
+          console.error('Error picking image:', err);
         }
-      }
-    };
+    }
 
     return (
         
             <View style={{height:'100%',backgroundColor:'white'}}>
               <SafeAreaView>  
                 {/* View Thông tin */}
-                <View style={{...styles.cardTop,marginTop:MarginTopByDevice(),marginTop:10}} keyboardShouldPersistTaps="handled">
+                <View style={{...styles.cardTop,marginTop:10}} keyboardShouldPersistTaps="handled">
 
                         {/* View Ảnh */}
                         <View style={{flexDirection:'row',paddingTop: 10,paddingLeft:10}}>
-                            {anh==null? 
-                            (
-                            <TouchableOpacity onPress={()=>{selectImage()}}>
+                            <TouchableOpacity onPress={()=>{fSetImage()}}>
                               <Avatar.Image
-                                source={icons.user_button}
-                                size={40}
-                                style={{
-                                  backgroundColor:'white',
-                                  tintColor: 'black'
-                              }}   
-                              />
-                            </TouchableOpacity>
-                            ):(
-                            <TouchableOpacity onPress={()=>{selectImage()}}>
-                              <Avatar.Image
-                                source={{uri: anh}} 
+                                source={anh?{uri: anh}:icons.user_button} 
                                 size={40}     
                               />
-                            </TouchableOpacity>)} 
+                            </TouchableOpacity>
                             <View style={{marginLeft:10,marginTop:-5}}>
                                   <Text style={{fontSize: 15,width:windowWidth*0.87,marginLeft:5,color:'#4F4F4F'}}>Tài khoản: {manhanvien}</Text>
                                   <Text style={{fontSize: 15,width:windowWidth*0.87,marginLeft:5,color:'#4F4F4F'}}>Họ tên: {tennhanvien}</Text>
@@ -854,7 +404,7 @@ export default function UserScreen({navigation,route}) {
             
                   {/*visible ? ViewModalThemUser():null*/}
                   {/*visibleXoaUser?ViewActionType():null*/}
-                  {visible==true?<LoadingAnimation />:null}
+                  {visible==true?<ViewLoadingAnimation />:null}
                   {modalthongbao == true ? (FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,setVisible)) : null}
               </SafeAreaView>
             </View>

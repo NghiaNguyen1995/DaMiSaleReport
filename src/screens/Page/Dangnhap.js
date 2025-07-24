@@ -23,7 +23,9 @@ import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder, crea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GetLogin } from '../../api/SalesManager';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
-import * as DocumentPicker from 'expo-document-picker';
+import { pick, types } from '@react-native-documents/picker';
+import RNFS from 'react-native-fs';
+import { getBaseURL } from '../../api/ApiManager';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -34,7 +36,7 @@ export default function Login({ navigation }) {
     const [Token, setToken] = useState('')
     const [page, setPage] = useState(SIGN_IN);
 
-    const [appname,setappname]=useState()
+    const [tencongty,settencongty]=useState()
     const [visibleLoadData,setvisibleLoadData]=useState(false)
 
     useEffect(() => {
@@ -97,9 +99,20 @@ export default function Login({ navigation }) {
     } 
 
     //Lấy tên App
-    const Getappcaption =()=>{
-      const filePath = require('../../../package.json');
-      setappname(filePath.appcaption)
+    const Getappcaption=async()=>{
+      //AsyncStorage.removeItem('user');
+      
+      //const filePath = require('../../../package.json');
+      //settencongty(filePath.appcaption)
+      
+      let user = JSON.parse(await AsyncStorage.getItem('user'));
+      
+      if(user){
+        settencongty(user.CompanyName)
+      }else{
+        const filePath = require('../../../package.json');
+        settencongty(filePath.appcaption)
+      }
     }
 
     //Lấy thông báo từ Firebase.
@@ -140,26 +153,45 @@ export default function Login({ navigation }) {
       const [urlImage, setUrlImage] = useState('');
 
       async function fGetImage(){
-        setUrlImage(await AsyncStorage.getItem('urlImage') )
+        let url = await AsyncStorage.getItem('urlImage')
+        if(url!=null && url!='')
+        {
+          setUrlImage(url)
+        }
       }
 
       async function fSetImage() {
         try {
-            const res = await DocumentPicker.getDocumentAsync({
-              type: 'image/*',
-              copyToCacheDirectory: true,
-            });
+          const results = await pick({
+            types: [types.images],
+            allowMultiSelection: false,
+            copyToCacheDirectory: false,
+          });
 
-            if (res.type === 'success') {
-              setUrlImage(res.uri);
-              await AsyncStorage.setItem('urlImage', res.uri);
-            } else {
-              console.log('User cancelled picker');
-            }
+          const res = results[0];
+
+          if (!res || !res.uri) {
+            console.log('Không chọn ảnh nào');
+            return;
+          }
+
+          // Lấy extension file
+          const ext = res.name?.split('.').pop() || 'jpg';
+          const destPath = `${RNFS.CachesDirectoryPath}/${Date.now()}.${ext}`;
+
+          // Copy từ content:// sang cache folder
+          await RNFS.copyFile(res.uri, destPath);
+
+          const fileUri = `file://${destPath}`;
+          console.log('Copied file to:', fileUri);
+
+          setUrlImage(fileUri);
+          await AsyncStorage.setItem('urlImage', fileUri);
         } catch (err) {
-            console.error('Error picking image:', err);
+          console.error('Error picking image:', err);
         }
       }
+
 
       useEffect(() => {
           fGetImage()  
@@ -168,12 +200,13 @@ export default function Login({ navigation }) {
         return (
           <View style={{ flex: 1}}>
             <StatusBar barStyle='light-content' />
-            <View style={{ width: '100%', height: '100%',alignItems: 'center', justifyContent: 'center',alignSelf:'center'}}>
+            <View style={{ width: '100%', height: '100%',alignItems: 'center', justifyContent: 'center',alignSelf:'center',paddingTop:30}}>
                   <TouchableOpacity onPress={()=>{fSetImage()}}>
-                    <Image   source={urlImage ? { uri: urlImage } : icons.logoDami} />
+                    <Image  source={urlImage ? { uri: urlImage } : icons.logoDami}
+                            style={{ width: 280, height: 150 }} />
                   </TouchableOpacity>
                   
-                  <Text style={{ color: COLORS.app.title, fontSize: 25, fontWeight: 'bold', fontFamily: 'Roboto-Bold',marginTop:20 }}>{appname}</Text>
+                  <Text style={{ color: COLORS.app.title, fontSize: 25, fontWeight: 'bold', fontFamily: 'Roboto-Bold',marginTop:20 }}>{tencongty}</Text>
                   <Text style={{ color: "black", fontSize: 20, fontFamily: 'Roboto-Bold',marginTop:20,alignContent:"center" }}>Quản lý Bán hàng trên Mobile</Text>                           
             </View>
           </View>
@@ -216,16 +249,29 @@ export default function Login({ navigation }) {
         }
 
         async function fGetLoginAPI() {
-          await GetLogin(manv,pw,setvisileLoad).then((data)=>{
-            if(data.status==200){
-                let user = {
-                  'manv': manv.toUpperCase(),
-                  'hoten': manv.toUpperCase(),
-                  'pw': pw
-                }
-                AsyncStorage.setItem('user', JSON.stringify(user))
 
-                navigation.navigate(NameScreen.TrangChu, user)
+          await GetLogin(manv,pw,setvisileLoad).then((data)=>{
+            console.log('Data trả về sau đăng nhập: ',data.data.ObjectData);
+            if (data.status == 200) {
+                let user = data.data.ObjectData;
+
+                if (user && typeof user === 'object') {
+                    user.ID = manv.toUpperCase();  
+                    user.Password = pw;  
+                    console.log('Có ObjectData: ', user);
+                    AsyncStorage.setItem('user', JSON.stringify(user));
+                    navigation.navigate(NameScreen.TrangChu, user);
+                } else {
+                    console.log('Không Có ObjectData');
+                    const defaultUser = {
+                        'ID': manv.toUpperCase(),
+                        'UserName': manv.toUpperCase(),
+                        'CompanyName': manv.toUpperCase(),
+                        'Password': pw
+                    };
+                    AsyncStorage.setItem('user', JSON.stringify(defaultUser));
+                    navigation.navigate(NameScreen.TrangChu, defaultUser);
+                }
             }else{
                 if(data.status==401){
                     setloaithongbao('ErrorPassword');
@@ -243,8 +289,8 @@ export default function Login({ navigation }) {
         async function getRememberTaikhoan(){
             let usrRemember = JSON.parse(await AsyncStorage.getItem('user'))
             if(manv!=null && pw!=null){
-                setmanv(usrRemember.manv)
-                setpw(usrRemember.pw)
+                setmanv(usrRemember.ID)
+                setpw(usrRemember.Password)
             }
         }
 
@@ -309,26 +355,7 @@ export default function Login({ navigation }) {
           
         );
     }
-    
-    /*function testSo(){
-      let so = '-123 456'
-      let so1 = '-15  789 , 13'
-      let so2 = '-133 466 , 134'
-      let so3 = '12  235 ,  01'
-
-      console.log('Số chưa đổi:\n',so,'\n',''+so1,'\n',so2,'\n',so3)
-
-      so=fFormatNumberSafe(so)
-      so1=fFormatNumberSafe(so1)
-      so2=fFormatNumberSafe(so2)   
-      so3=fFormatNumberSafe(so3)
-      
-      console.log('so đã chuyển: ',so)
-      console.log('so1 đã chuyển: ',so1)
-      console.log('so2 đã chuyển: ',so2)
-      console.log('so3 đã chuyển: ',so3)
-    }*/
-    
+   
     const Footer = () => {
 
         return (

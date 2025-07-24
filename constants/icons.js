@@ -76,8 +76,6 @@ const ChuaDuyet = require('../assets/icons/ChuaDuyet.png')
 const loginbygg = require('../assets/icons/google.png')
 
 
-
-
 "DaMi"
 const report_bucket = require('../assets/icons/warehouse.png')
 const logoDami = require('../assets/icons/logoDaMi.png')
@@ -86,8 +84,9 @@ const todate = require('../assets/icons/todate.png')
 const trove = require('../assets/icons/trove.png')
 const documentopen = require('../assets/icons/documentopen.png')
 const documentclose = require('../assets/icons/documentclose.png')
+const doanhthubanhang = require('../assets/icons/doanhthubanhang64.png')
 
-
+const bucket_animated = require('../assets/icons/warehouse_gif.gif')
 
 export default {
 
@@ -183,8 +182,10 @@ export default {
     todate,
     trove,
     documentopen,
-    documentclose
-  
+    documentclose,
+    doanhthubanhang,
+    bucket_animated
+
 }
 
 

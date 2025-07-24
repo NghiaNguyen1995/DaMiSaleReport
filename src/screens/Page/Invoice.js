@@ -13,7 +13,7 @@ import { containerHeader, containerInput, containerView, GridStyle, ModalNewStyl
 import { NameScreen } from '../../../constants/NameScreen';
 import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetSalesVoucher } from '../../api/SalesManager';
+import { GetEmployeeList, GetGeneralSalesByDate, GetSalesVoucher } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
@@ -27,11 +27,22 @@ export default function Invoice({navigation,route}) {
 
     // Dữ liệu cho ngày voucher khi chọn voucher
     const [dVoucher,setdVoucher] = useState(new Date());
+    const [startDay,setstartDay] = useState();
+    const [toDay,settoDay] = useState();
+    const [loaibamngay,setloaibamngay] = useState('');
     const [calendarSelectedDate, setcalendarSelectedDate] = useState('');
     const [openViewCalendar,setopenViewCalendar] = useState(false)
 
+
+    
+    // Phiếu và khách hàng
     const [vVoucher, setvVoucher] = useState('');
     const [vCustumer, setvCustumer] = useState('');
+
+    //Dropbox Nhân viên
+    const [vStaff, setvStaff] = useState(null);
+    const [iStaff, setiStaff] = useState([]);
+    
 
     // Set loại thông báo hiển thị
     const [modalthongbao,setmodalthongbao] = useState(false)
@@ -57,7 +68,9 @@ export default function Invoice({navigation,route}) {
     let defaultKeys = ["RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", "UnitName", "Quantity", "ConvertPrice", "ConvertAmount", "NoteDetails", "PrepairedByName"];
     let defaultKeyRutgon = ["ItemName","Quantity","ConvertPrice", "ConvertAmount"];
 
-    const [visibleKeys, setVisibleKeys] = useState(defaultKeys);
+    let baocaodoanhthu =["VoucherDate","SalesManName","Quantity","ConvertAmount","ItemGroupID","WareHouseID"];
+
+    const [visibleKeys, setVisibleKeys] = useState(route.params.id=='phieugiaohang'?defaultKeys:baocaodoanhthu);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
 
@@ -193,11 +206,12 @@ export default function Invoice({navigation,route}) {
         )
     }
 
-    const ComponentInput = () => {
+    const ComponentInputPhieuGiaoHang = () => {
         
         const [localvVoucher, setlocalvVoucher] = useState(vVoucher);
         const [localvCustumer, setlocalvCustumer] = useState(vCustumer);
-        
+        const [oStaff, setoStaff] = useState(null);
+
         useEffect(()=>{
             setlocalvVoucher(vVoucher);
             setlocalvCustumer(vCustumer);
@@ -205,22 +219,39 @@ export default function Invoice({navigation,route}) {
 
         return (
             <View style={{...containerInput.ctnInput, paddingTop:5}}>
+                
+                {/* Hai textInput của Nhập số phiếu và nhập tên khách hàng */}
+                
                 <View style={{flexDirection:'row',alignItems:'center', gap: 15}}>
-                    <View style={{...containerInput.viewItem, width:'60%', height:50}}>
-                        <TextInput 
-                            style={containerInput.textInput}
-                            value={localvVoucher}
-                            placeholder={'Nhập số phiếu'}
-                            onChangeText={(text) => setlocalvVoucher(text)}
-                        />
-                        {/*<Icon 
-                            name="star"
-                            size={15}
-                            style={{position: 'absolute', top: -10, right: -5, color:'red', zIndex:1}}
-                        />*/}
-                    </View>
-
-                    <View style={{...containerInput.viewItem, width:'35%', height:50, alignItems:'center'}}>
+                        
+                        <View style={{...containerInput.viewItem, width:'48%', height:50}}>
+                            <TextInput 
+                                style={containerInput.textInput}
+                                value={localvVoucher}
+                                placeholder={'Nhập số phiếu'}
+                                onChangeText={(text) => setlocalvVoucher(text)}
+                            />
+                            {/*<Icon 
+                                name="star"
+                                size={15}
+                                style={{position: 'absolute', top: -10, right: -5, color:'red', zIndex:1}}
+                            />*/}
+                        </View>
+                
+                        <View style={{...containerInput.viewItem, width:'48%', height:50}}>
+                            <TextInput 
+                                style={containerInput.textInput}
+                                value={localvCustumer}
+                                placeholder={'Nhập tên khách hàng'}
+                                onChangeText={(text) => setlocalvCustumer(text)}
+                            />
+                        </View>
+                </View>
+           
+                {/* Gồm 3 nút: Lịch, nhân viên, nạp dữ liệu */}
+                <View style={{flexDirection:'row',alignItems:'center', gap: 10}}>
+        
+                    <View style={{...containerInput.viewItem, width:'32%', height:50, alignItems:'center'}}>
                         <TouchableOpacity 
                             onPress={() => {
                                 setvVoucher(localvVoucher);
@@ -242,30 +273,117 @@ export default function Invoice({navigation,route}) {
                                 </Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-
-                <View style={{flexDirection:'row',alignItems:'center', gap: 15}}>
-                    <View style={{...containerInput.viewItem, width:'60%', height:50}}>
-                        <TextInput 
-                            style={containerInput.textInput}
-                            value={localvCustumer}
-                            placeholder={'Nhập tên khách hàng'}
-                            onChangeText={(text) => setlocalvCustumer(text)}
+          
+                    <View style={{width:'35%'}}>
+                        <ViewDroppoxStaff 
+                            vStaff={vStaff}
+                            setvStaff={setvStaff}
+                            iStaff={iStaff}
+                            setiStaff={setiStaff}
+                            oStaff={oStaff}
+                            setoStaff={setoStaff}
                         />
-                    </View>
+                    </View>   
+             
                     <TouchableOpacity 
                         onPress={() => {
-                            if (localvVoucher == '' && localvCustumer=='' && dVoucher=='') {
+                            if (localvVoucher == '' && localvCustumer== '' && dVoucher== '') {
                                 setloaithongbao('DataInput');
                                 setmodalthongbao(true);
                                 return;
                             }
                             fNapdulieu(localvVoucher, localvCustumer);
                         }} 
-                        style={{...containerInput.buttonOK, marginTop:10, width:'35%',height:50}}>
+                        style={{...containerInput.buttonOK, marginTop:10, width:'28%',height:50}}>
                             <Text style={containerInput.buttonText}>Nạp dữ liệu</Text> 
                     </TouchableOpacity>
                 </View>
+
+            </View>
+        );
+    }
+
+    const ComponentInputquanlydoanhthu = () => {
+        
+   
+        const [oStaff, setoStaff] = useState(null);
+
+
+        return (
+            <View style={{...containerInput.ctnInput, paddingTop:5}}>
+                
+                {/*Chọn từ ngày đến ngày*/}
+                <View style={{...containerInput.viewItem}}>
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setloaibamngay('s');
+                                setcalendarSelectedDate(startDay);
+                                setopenViewCalendar(true);
+                            }} 
+                            style={{flexDirection:'row'}}>         
+                                    <Image 
+                                        source={icons.fromdate}
+                                        style={{tintColor:COLORS.lime,height:25,width:25}}
+                                    />  
+                                    <Text style={{...containerInput.textvalue,paddingTop:3,paddingLeft:10}}>TỪ NGÀY: {moment(startDay).format('DD/MM/YYYY')}</Text>
+                        </TouchableOpacity>
+                        <Icon 
+                            name="star"
+                            size={15}
+                            style={{position: 'absolute',top: -10,right: -5,color:'red',zIndex:1}}
+                        />
+                </View>
+                              
+                {/*Chọn từ ngày đến ngày*/}
+                <View style={{...containerInput.viewItem}}>
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setloaibamngay('t');
+                                setcalendarSelectedDate(toDay);
+                                setopenViewCalendar(true);
+                            }} 
+                            style={{flexDirection:'row'}}>         
+                                    <Image 
+                                        source={icons.todate}
+                                        style={{tintColor:COLORS.red,height:25,width:25}}
+                                    />  
+                                    <Text style={{...containerInput.textvalue,paddingTop:3,paddingLeft:10}}>ĐẾN NGÀY: {moment(toDay).format('DD/MM/YYYY')}</Text>
+                        </TouchableOpacity>
+                        <Icon 
+                            name="star"
+                            size={15}
+                            style={{position: 'absolute',top: -10,right: -5,color:'red',zIndex:1}}
+                        />
+                </View>
+
+                {/* Gồm 3 nút: Lịch, nhân viên, nạp dữ liệu */}
+                <View style={{flexDirection:'row',alignItems:'center', gap: 20}}>
+
+                    <View style={{width:'50%'}}>
+                        <ViewDroppoxStaff 
+                            vStaff={vStaff}
+                            setvStaff={setvStaff}
+                            iStaff={iStaff}
+                            setiStaff={setiStaff}
+                            oStaff={oStaff}
+                            setoStaff={setoStaff}
+                        />
+                    </View>   
+             
+                    <TouchableOpacity 
+                        onPress={() => {
+                            if (startDay == '' && toDay=='') {
+                                setloaithongbao('DataInput');
+                                setmodalthongbao(true);
+                                return;
+                            }
+                            fNapdulieu('','');
+                        }} 
+                        style={{...containerInput.buttonOK, marginTop:10, width:'45%',height:50}}>
+                            <Text style={containerInput.buttonText}>Nạp dữ liệu</Text> 
+                    </TouchableOpacity>
+                </View>
+
             </View>
         );
     }
@@ -293,17 +411,10 @@ export default function Invoice({navigation,route}) {
                     setCurrentOpen(val ? 'voucher' : null);
                 }}
                 setValue={(callback) => {
-                    const newObj = callback(vVoucher); // lấy object mới được chọn
-
-                    // newObj là object nguyên do value đã lưu nguyên object
-                    if (newObj && newObj.VoucherDate && newObj.VoucherNo) {
-                        setdVoucher(newObj.VoucherDate);
-                        setvVoucher(newObj);
-                    } else {
-                        setdVoucher('');
-                        setvVoucher({});
-                    }
-                    return newObj;
+                    const newValue = callback(value);
+                    setvVoucher(newValue);
+                    console.log('value được chọn: ',newValue)
+                    return newValue;
                 }}
                 setItems={setiVoucher}
                 placeholder="Chọn hóa đơn"
@@ -313,35 +424,22 @@ export default function Invoice({navigation,route}) {
         );
     };
 
-    "View Droppox Custumer"
-    const ViewDroppoxCustumer = ({vCustumer,setvCustumer,iCustumer,setiCustumer,currentOpen,setCurrentOpen}) => {
-        const [open, setOpen] = useState(false);
-
-        useEffect(() => {
-            if (currentOpen !== 'custumer' && open) {
-                setOpen(false);
-            }
-        }, [currentOpen]);
-
+    "View Droppox Staff"
+    const ViewDroppoxStaff = ({vStaff,setvStaff,iStaff,setiStaff,oStaff,setoStaff}) => {
+    
         return (
                 <DropDownPicker
-                    open={open}
-                    value={vCustumer}
-                    items={iCustumer}
-                    setOpen={(val) => {
-                        setOpen(val);
-                        setCurrentOpen(val ? 'custumer' : null);
-                    }}
-                    setValue={(callback) => {
-                        const newValue = callback(newValue);
-                        setvCustumer(newValue);
-                        console.log('vCustumer được chọn: ',newValue)
-                        return newValue;
-                    }}
-                    setItems={setiCustumer}
-                    placeholder={"Chọn khách hàng"}
-                    style={{ zIndex: 1000, marginTop: 10,width:'60%' }}
-                    dropDownContainerStyle={{ width: '60%' }}
+                    open={oStaff}
+                    value={vStaff}
+                    items={iStaff}
+                    setOpen={setoStaff}
+                    setValue={setvStaff}
+                    setItems={setiStaff}
+                    searchable={true}
+                    searchPlaceholder='Nhập NV'
+                    placeholder={"Chọn NV"}
+                    style={{ zIndex: 1000, marginTop: 10,width:'100%',height:50 }}
+                    dropDownContainerStyle={{ width: '100%' }}
                 />
         );
     };
@@ -370,7 +468,8 @@ export default function Invoice({navigation,route}) {
                             <Text style={{fontSize:15,fontWeight:'bold',color:'white'}}>CHỌN NGÀY</Text>
                     
                             <TouchableOpacity onPress={()=>{
-                                            setdVoucher(new Date());
+                                            titleHeaderComponent.id==='phieugiaohang' && setdVoucher(new Date());
+                                            titleHeaderComponent.id==='nhanvienbanhang'&& setstartDay(new Date());
                                             setcalendarSelectedDate(new Date());
                                             setopenViewCalendar(false);
                                         }}style={{flexDirection:'row'}}>
@@ -413,13 +512,13 @@ export default function Invoice({navigation,route}) {
                         ]}
                         previousTitle="Trước"
                         nextTitle="Sau"
-                        todayBackgroundColor="#e6ffe6"
+                        todayBackgroundColor={COLORS.yellow}  
                         selectedDayColor="#66ff33"
                         selectedDayTextColor="#000000"
-                        scaleFactor={375}
+                        scaleFactor={380}
                         textStyle={{
-                        fontFamily: 'Cochin',
-                        color: '#000000',
+                            fontFamily: 'Cochin',
+                            color: '#000000',
                         }}
                         onDateChange={fOnDateChange}
                     />
@@ -431,7 +530,15 @@ export default function Invoice({navigation,route}) {
 
     "Function xử lý khi chọn ngày trên ViewCalendar xong"
     function fOnDateChange(date){
-        setdVoucher(date)
+        if(titleHeaderComponent.id==='phieugiaohang'){
+            setdVoucher(date);
+        }else{
+            if(loaibamngay=='s'){
+            setstartDay(date)
+            }else{
+                settoDay(date)
+            }
+        }
         setopenViewCalendar(false)
     };
     //#endregion
@@ -441,6 +548,9 @@ export default function Invoice({navigation,route}) {
     function fInitLoad(){
         
         settitleHeaderComponent(route.params);
+        
+        fLoadDataToDropBox();
+        clsFunc.fSetTimeFromTo(setstartDay,settoDay);
 
         if(data != ""){
             fInitFilter(data,setFilters);
@@ -459,21 +569,32 @@ export default function Invoice({navigation,route}) {
     //#endregion
 
     //#region Function Load API From BackEnd
+    "Chức năng lấy API List và gắn vô Data"
+    async function fLoadDataToDropBox(){
+        await GetEmployeeList().then((data)=>{
+            if(data.status==200 && data.data?.ObjectData?.length > 0){
+                clsFunc.fLoadDataToCombobox(data.data.ObjectData,setiStaff)
+            }
+        })
+           
+    }
+
     "Hàm nạp dữ liệu khi người dùng nhấn nút"
     function fNapdulieu(voucher,custumer){
         setvVoucher(voucher);
         setvCustumer(custumer);
-        fGetSalesVoucher(voucher,custumer);
+        titleHeaderComponent.id==='phieugiaohang'?fGetSalesVoucher(voucher,custumer):fGetGeneralSalesByDate();
     }
 
-    "Hàm lấy dữ liệu "
+    "Hàm lấy dữ liệu Phiếu giao hàng"
     async function fGetSalesVoucher(voucher,custumer){
 
-        let dayVoucher = dVoucher =='' ? '' : moment(dVoucher).format("YYYY-MM-DD");
+        let dayVoucher = dVoucher == '' ? '' : moment(dVoucher).format("YYYY-MM-DD");
+        let vS = vStaff != null? vStaff : '';
 
         setvisibleLoadData(true);
-
-        await GetSalesVoucher(dayVoucher,voucher,custumer,setvisibleLoadData).then((data)=>{
+        
+        await GetSalesVoucher(dayVoucher,voucher,custumer,vS,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log("Get dữ liệu hóa đơn",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -484,9 +605,40 @@ export default function Invoice({navigation,route}) {
                     setData([]);
                     setFilteredData([]);
                 }
-                setvisibleLoadData(false);
+
             }
         })
+    }
+
+    "Hàm lấy dữ liệu Báo cáo doanh thu"
+    async function fGetGeneralSalesByDate(){
+
+        let std = moment(startDay).format("YYYY-MM-DD");
+        let td = moment(toDay).format("YYYY-MM-DD");
+        let vS = vStaff != null? vStaff : '';
+
+        let checkBeforeGetData = clsFunc.fCheckFromToDate(std,td);
+        
+        if(!checkBeforeGetData){
+            setloaithongbao('WarningDate');
+            setmodalthongbao(true);
+            return;
+        }else{
+            setvisibleLoadData(true);
+            await GetGeneralSalesByDate(std,td,vS,'','',setvisibleLoadData).then((data)=>{
+                if(data.status==200){
+                    console.log("Get dữ liệu báo cáo doanh thu: ",data.data.ObjectData);
+                    if(data.data.ObjectData.length > 0) {
+                        setData(data.data.ObjectData);
+                        setFilteredData(data.data.ObjectData);
+                        setTotalRow(data.data.SummaryData);                   
+                    }else{
+                        setData([]);
+                        setFilteredData([]);
+                    }
+                }
+            })
+        }
     }
 
     "Hàm nạp dữ liệu ch List data detail khi người dùng chọn dòng item"
@@ -495,9 +647,21 @@ export default function Invoice({navigation,route}) {
         let vDate = moment(item.VoucherDate,"DD/MM/YYYY").format("YYYY-MM-DD");
         let VoucherNo = item.VoucherNo;
         let TradeName = item.TradeName != null && item.TradeName !=''?item.TradeName : '';
+        let SalesManID = '';
+        if (iStaff && Array.isArray(iStaff)) {
+            const foundStaff = iStaff.find(staff => staff.label === item.PrepairedByName);
+            console.log('foundStaff:', foundStaff);
+            if (foundStaff && 'value' in foundStaff) {
+                SalesManID = foundStaff.value;
+            }
+        }else{
+            SalesManID='';
+        }
+        console.log('SalesManID:', SalesManID);
 
-        setvisibleLoadData(true)
-        await GetSalesVoucher(vDate,VoucherNo,TradeName,setvisibleLoadData).then((data)=>{
+        setvisibleLoadData(true);
+
+        await GetSalesVoucher(vDate,VoucherNo,TradeName,SalesManID,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 if(data.data.ObjectData.length > 0) {
 
@@ -508,12 +672,14 @@ export default function Invoice({navigation,route}) {
                     setdatadetail(data.data.ObjectData);
                     setTotalRow(data.data.SummaryData);
 
-                    
                     InteractionManager.runAfterInteractions(() => {
                         setmodalPhieugiaohang(true);
                     });
+                }else{
+                    console.log("data.data.ObjectData: ",data.data.ObjectData)
                 }
-                setvisibleLoadData(false);
+            }else{
+                console.log('data back end: ',data)
             }
         })    
     }
@@ -693,7 +859,9 @@ export default function Invoice({navigation,route}) {
                     
                     <ComponentHeader />
                     
-                    <ComponentInput />
+                    {titleHeaderComponent.id==='phieugiaohang'?
+                        <ComponentInputPhieuGiaoHang />:<ComponentInputquanlydoanhthu />
+                    }
 
                     <View style={{ flex: filteredData.length>0?1:null}}>
                             <ScrollView
@@ -740,7 +908,10 @@ export default function Invoice({navigation,route}) {
                                             if (!show) return null;
                                     
                                             return (
-                                                <TouchableOpacity style={{...GridStyle('').dataRow}} onPress={()=>{fDetailItem(item)}}>
+                                                <TouchableOpacity style={{...GridStyle('').dataRow}} 
+                                                    onPress={()=>{
+                                                        route.params.id=='phieugiaohang'?fDetailItem(item):null
+                                                    }}>
                                                     {keys.map(key => (
                                                         <Text 
                                                             key={key} 

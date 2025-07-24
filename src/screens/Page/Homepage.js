@@ -33,7 +33,7 @@ export const TrangChu = ({navigation,route}) => {
     },[navigation])
 
     const setdulieu = async () => {
-        if (route.params && 'hoten' in route.params) {
+        if (route.params && 'UserName' in route.params) {
             setuser(route.params)
         } else {
             let usrRemember = JSON.parse(await AsyncStorage.getItem('user'))
@@ -97,7 +97,8 @@ export const TrangChu = ({navigation,route}) => {
     const featuresData = [
         {
             id: 'baocaotonkho',
-            icon: icons.report_bucket,           
+            icon: icons.report_bucket, 
+            //icon: icons.bucket_animated,          
             description: "BÁO CÁO\nTỒN KHO"
         }, 
         { 
@@ -113,6 +114,12 @@ export const TrangChu = ({navigation,route}) => {
             //color: COLORS.purple,
             //backgroundColor: COLORS.lightpurple,
             description: "PHIẾU\nGIAO HÀNG"
+        },{ 
+            id: 'doanhthubanhang',
+            icon: icons.doanhthubanhang,
+            //color: COLORS.purple,
+            //backgroundColor: COLORS.lightpurple,
+            description: "DOANH THU\nBÁN HÀNG"
         }
     ]
 
@@ -128,6 +135,9 @@ export const TrangChu = ({navigation,route}) => {
                 navigation.navigate(NameScreen.Tonghophanghoa,item)
                 break;
             case 'phieugiaohang':
+                navigation.navigate(NameScreen.Phieugiaohang,item)
+                break;
+            case 'doanhthubanhang':
                 navigation.navigate(NameScreen.Phieugiaohang,item)
                 break;
             // ... thêm các case khác
@@ -156,7 +166,7 @@ export const TrangChu = ({navigation,route}) => {
                  </View>
                  
                 <View style={{ flex: 1,justifyContent:'center',marginLeft:30}} >                  
-                     <Text style={{ ...FONTS.body3,color:'white'}}>{user.hoten?user.hoten:null}</Text>                    
+                     <Text style={{ ...FONTS.body3,color:'white'}}>{user.UserName?user.UserName:''}</Text>                    
                 </View>
 
                 <View style={{justifyContent: 'space-between',flexDirection:'row'}}>
@@ -195,10 +205,10 @@ export const TrangChu = ({navigation,route}) => {
             
             <TouchableOpacity
                 style={{ 
-                    width: '31%',
+                    width:'35%',//width: '31%',
                     alignItems: 'center',
-                    marginLeft:7,
-                    marginBottom:10,
+                    marginLeft:40,//marginLeft:7,
+                    marginBottom:15,//marginBottom:10,
                     shadowColor: 'black',
                     shadowOffset: { width: 0, height: 6 },
                     shadowOpacity: 0.3,
@@ -240,7 +250,7 @@ export const TrangChu = ({navigation,route}) => {
                 <FlatList
                     //ListHeaderComponent={Header}
                     data={features}
-                    numColumns={3}
+                    numColumns={2}
                     columnWrapperStyle={{ }}
                     keyExtractor={item => item.id}
                     renderItem={renderItem}

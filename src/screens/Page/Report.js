@@ -38,11 +38,11 @@ export default function Report({navigation,route}) {
     const [loaithongbao,setloaithongbao] = useState('')
 
     // Dữ liệu cho comboBox Kỳ báo cáo 
-    const [valueKho, setvalueKho] = useState('');
+    const [valueKho, setvalueKho] = useState(null);
     const [itemKho, setitemKho] = useState([]);
 
     // Dữ liệu cho comboBox Kho hoặc Tài khoản công nợ
-    const [value, setvalue] = useState('');
+    const [value, setvalue] = useState(null);
     const [item, setitem] = useState([]);
 
     // List Data từ Nút nạp dữ liệu 
@@ -391,6 +391,7 @@ export default function Report({navigation,route}) {
                         }}
                         setItems={setitemKho}
                         searchable={true}
+                        searchPlaceholder='Nhập kho'
                         placeholder="Chọn kho"
                         style={{ zIndex: 2000,marginTop:10,width:'100%'}}
                         dropDownContainerStyle={{ width: '100%' }}
@@ -481,8 +482,8 @@ export default function Report({navigation,route}) {
     }
  
     "Hàm lấy dữ liệu Báo cáo Tồn kho đầy đủ"
-    async function fGetInventoryBalanceByDate(std,td) {
-        await GetInventoryBalanceByDate(value,valueKho,std,td,setvisibleLoadData).then((data)=>{
+    async function fGetInventoryBalanceByDate(vTaikhoan,vKho,std,td) {
+        await GetInventoryBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
              if(data.status==200){
                 console.log("Get Báo cáo Tồn kho đầy đủ",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -499,10 +500,10 @@ export default function Report({navigation,route}) {
     }
 
     "Hàm lấy dữ liệu Báo cáo Tồn kho đến ngày (dạng rút gọn)"
-    async function fGetEndInvBalanceByDate(std,td) {
-        await GetEndInvBalanceByDate(value,valueKho,std,td,setvisibleLoadData).then((data)=>{
+    async function fGetEndInvBalanceByDate(vTaikhoan,vKho,std,td) {
+        await GetEndInvBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
-                console.log('Get Báo cáo Tồn kho (dạng rút gọn): ',data.ObjectData);
+                console.log('Get Báo cáo Tồn kho (dạng rút gọn): ',data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
                     setData(data.data.ObjectData);
                     setFilteredData(data.data.ObjectData);
@@ -517,8 +518,8 @@ export default function Report({navigation,route}) {
     }
 
     "Hàm lấy dữ liệu Báo cáo Công nợ (dạng đầy đủ)"
-    async function fGetCustomerBalancebyDate(std,td) {
-        await GetCustomerBalancebyDate(value,std,td,setvisibleLoadData).then((data)=>{
+    async function fGetCustomerBalancebyDate(vTaikhoan,std,td) {
+        await GetCustomerBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log("Get Báo cáo công nợ đầy đủ",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -536,8 +537,8 @@ export default function Report({navigation,route}) {
     }
 
     "Hàm lấy dữ liệu Báo cáo Công nợ đến ngày (dạng rút gọn)"
-    async function fGetEndCustBalancebyDate(std,td){
-        await GetEndCustBalancebyDate(value,std,td,setvisibleLoadData).then((data)=>{
+    async function fGetEndCustBalancebyDate(vTaikhoan,std,td){
+        await GetEndCustBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log("Get Báo cáo công nợ rút gọn",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -556,8 +557,23 @@ export default function Report({navigation,route}) {
     "Hàm nạp dữ liệu khi người dùng nhấn nút"
     function fNapdulieu(){
 
+        let vKho,vTaikhoan = '';
         let std = moment(startDay).format("YYYY-MM-DD");
         let td = moment(toDay).format("YYYY-MM-DD");
+
+        if(titleHeaderComponent.id==='baocaotonkho'){
+            if(valueKho==null){
+                vKho = '';
+            }else{
+                vKho=valueKho
+            }
+        }else{
+            if(value==null){
+                vTaikhoan='';
+            }else{
+                vTaikhoan=value;
+            }
+        }
         let checkBeforeGetData = clsFunc.fCheckFromToDate(std,td);
 
         if(!checkBeforeGetData){
@@ -568,15 +584,15 @@ export default function Report({navigation,route}) {
             setvisibleLoadData(true);
             if(route.params.id=="baocaotonkho"){
                 if(vViewFull==true){
-                    fGetInventoryBalanceByDate(std,td);
+                    fGetInventoryBalanceByDate(vTaikhoan,vKho,std,td);
                 }else{
-                    fGetEndInvBalanceByDate(std,td);
+                    fGetEndInvBalanceByDate(vTaikhoan,vKho,std,td);
                 }
             }else{
                 if(vViewFull==true){
-                    fGetCustomerBalancebyDate(std,td);
+                    fGetCustomerBalancebyDate(vTaikhoan,std,td);
                 }else{
-                    fGetEndCustBalancebyDate(std,td)
+                    fGetEndCustBalancebyDate(vTaikhoan,std,td)
                 }
             }
         }
@@ -691,7 +707,6 @@ export default function Report({navigation,route}) {
                     previousTitle="Trước"
                     nextTitle="Sau"
                     todayBackgroundColor={COLORS.yellow}
-        
                     selectedDayColor="#66ff33"
                     selectedDayTextColor="#000000"
                     scaleFactor={380} //375 là kích
