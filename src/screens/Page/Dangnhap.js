@@ -40,12 +40,10 @@ export default function Login({ navigation }) {
     const [visibleLoadData,setvisibleLoadData]=useState(false)
 
     useEffect(() => {
-
         RequestUserPermission()
         CheckApplicationPermission()
         Getappcaption()
         GetthongbaoFirebase()
-
     }, []);
    
     //Yêu cầu quyền thiết bị để lấy Token trong IOS
@@ -223,11 +221,11 @@ export default function Login({ navigation }) {
         const [visileLoad,setvisileLoad]= useState(false)
         
         useEffect(() => { 
-            getRememberTaikhoan()
+            fGetRememberTaikhoan()
         },[navigation]);
 
       
-        function LoginByPassWord(){
+        function fLoginByPassWord(){
           
           setvisileLoad(true)
           
@@ -286,7 +284,7 @@ export default function Login({ navigation }) {
            
         }
        
-        async function getRememberTaikhoan(){
+        async function fGetRememberTaikhoan(){
             let usrRemember = JSON.parse(await AsyncStorage.getItem('user'))
             if(manv!=null && pw!=null){
                 setmanv(usrRemember.ID)
@@ -299,10 +297,8 @@ export default function Login({ navigation }) {
           <View style={{...containerInput.ctnInput,height:'100%',marginTop:50,alignItems:'center'}}>
             
             
-            <View style={{ ...containerInput.viewItem,width:'90%'}}>
-                
+            <View style={{ ...containerInput.viewItem,width:'90%',height:50}}> 
                 <TextInput
-                  
                   style={{ ...containerInput.textLabel, width: windowWidth * 0.85 }}
                   placeholder="Tài khoản"
                   value={manv}
@@ -310,14 +306,10 @@ export default function Login({ navigation }) {
                   keyboardType='default'
                   onChangeText={text => { setmanv(text)}}
                 />
-            
-              
             </View>
           
-            <View style={{ ...containerInput.viewItem,marginTop:20,width:'90%'}}>
-              
+            <View style={{ ...containerInput.viewItem,marginTop:20,width:'90%',height:50}}>
                 <TextInput
-                  
                   style={{ ...containerInput.textLabel, width: windowWidth * 0.75 }}
                   placeholder="Mật khẩu"
                   value={pw}
@@ -326,12 +318,10 @@ export default function Login({ navigation }) {
                   onChangeText={text => { setpw(text)}}
                   onSubmitEditing={()=>{
                       if(manv!=''){
-                        LoginByPassWord()
+                        fLoginByPassWord()
                       }
-                  }}
-             
+                  }}  
                 />
-
                 <TouchableOpacity
                   style={{ ...styles.wrapperIcon }}
                   onPress={() => setSeePassword(!seePassword)}>
@@ -343,7 +333,7 @@ export default function Login({ navigation }) {
             <View style={{...buttonStyle.viewButton,paddingTop:windowHeight/60}}>   
                 <TouchableOpacity 
                     style={{...buttonStyle.buttonOK, width:windowWidth*0.85,flexDirection:"row",alignItems:'center'}} 
-                    onPress={() => { LoginByPassWord() }} 
+                    onPress={() => { fLoginByPassWord() }} 
                     disabled={visileLoad}> 
                   <Text style={{...buttonStyle.buttonText}}>Đăng nhập</Text>
                 </TouchableOpacity>
@@ -406,8 +396,7 @@ export default function Login({ navigation }) {
       </TouchableWithoutFeedback>
     );
 
-    return (
-      
+    return ( 
       <DismissKeyboard>
           <KeyboardAvoidingView 
               style={{ flex: 1, backgroundColor: 'white' }} 
@@ -416,10 +405,8 @@ export default function Login({ navigation }) {
           >
             
               <View style={{ height: '100%', width: '100%', flex: 1}}>
-                
                 <ImageBackground source={date.getMonth()+1 == 1 ?icons.backgroundtet:icons.backgroundchuan}
                   resizeMode='stretch' style={{ flex: 0 }}>
-                  
                       <SafeAreaView>
                           <View style={{ height: '25%', width: '100%'}}>
                             <Title page={page} setPage={setPage} />
@@ -434,11 +421,8 @@ export default function Login({ navigation }) {
                           </View>
                           
                       </SafeAreaView>
-
                 </ImageBackground>
-                
               </View>
-            
           </KeyboardAvoidingView>
       </DismissKeyboard>
       
