@@ -455,7 +455,7 @@ export default function Login({ navigation }) {
                     fRePassAPI()
                 }           
             }
-            
+
             async function fRePassAPI() {
                 let data = {
                       'userID': msUser.toUpperCase(),
@@ -480,69 +480,70 @@ export default function Login({ navigation }) {
 
             return(
               <Modal visible={mViewDoiMatKhau} animationType="fade" transparent>
-                <KeyboardAvoidingView
-                  behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-                  //keyboardVerticalOffset={Platform.OS === 'ios' ? 200 : 200}
-                >
                   <TouchableWithoutFeedback onPress={() => {
                       Keyboard.dismiss();
                       setmViewDoiMatKhau(false);                 
-                    }}>                  
+                    }}>    
+                    <KeyboardAvoidingView
+                      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 50}
+                    >              
                       <View style={{...ModalStyle.centeredView,flex:0,height:'100%'}}>
-                        <View style={{...ModalStyle.Modal}}>
-                          
+                          <View style={{...ModalStyle.Modal}}>
+                            
 
-                          <Text style={styles.title}>ĐỔI MẬT KHẨU</Text>
+                            <Text style={styles.title}>ĐỔI MẬT KHẨU</Text>
 
-                          <TextInput
-                            style={styles.textInput}
-                            placeholder="Tài khoản"
-                            value={msUser}
-                            onChangeText={setmsUser}
-                            autoCapitalize="characters"
-                            placeholderTextColor="#999"
-                          />
+                            <TextInput
+                              style={styles.textInput}
+                              placeholder="Tài khoản"
+                              value={msUser}
+                              onChangeText={setmsUser}
+                              autoCapitalize="characters"
+                              placeholderTextColor="#999"
+                            />
 
-                          <TextInput
-                            style={styles.textInput}
-                            placeholder="Nhập mật khẩu cũ"
-                            value={msPass}
-                            onChangeText={setmsPass}
-                            secureTextEntry
-                            placeholderTextColor="#999"
-                          />
+                            <TextInput
+                              style={styles.textInput}
+                              placeholder="Nhập mật khẩu cũ"
+                              value={msPass}
+                              onChangeText={setmsPass}
+                              secureTextEntry
+                              placeholderTextColor="#999"
+                            />
 
-                          <TextInput
-                            style={styles.textInput}
-                            placeholder="Nhập mật khẩu mới"
-                            value={msPassNew}
-                            onChangeText={setmsPassNew}
-                            secureTextEntry
-                            placeholderTextColor="#999"
-                          />
+                            <TextInput
+                              style={styles.textInput}
+                              placeholder="Nhập mật khẩu mới"
+                              value={msPassNew}
+                              onChangeText={setmsPassNew}
+                              secureTextEntry
+                              placeholderTextColor="#999"
+                            />
 
-                          <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                              style={[styles.button, { backgroundColor: '#1976D2' }]}
-                              onPress={() => {
-                                fResetPassword();
-                              }}
-                            >
-                              <Text style={styles.buttonText}>Cập nhập</Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonContainer}>
+                              <TouchableOpacity
+                                style={[styles.button, { backgroundColor: '#1976D2' }]}
+                                onPress={() => {
+                                  fResetPassword();
+                                }}
+                              >
+                                <Text style={styles.buttonText}>Cập nhập</Text>
+                              </TouchableOpacity>
 
-                            <TouchableOpacity
-                              style={[styles.button, { backgroundColor: COLORS.red }]}
-                              onPress={() => setmViewDoiMatKhau(false)}
-                            >
-                              <Text style={styles.buttonText}>Huỷ</Text>
-                            </TouchableOpacity>
+                              <TouchableOpacity
+                                style={[styles.button, { backgroundColor: COLORS.red }]}
+                                onPress={() => setmViewDoiMatKhau(false)}
+                              >
+                                <Text style={styles.buttonText}>Huỷ</Text>
+                              </TouchableOpacity>
+                            </View>
+                            
                           </View>
-                          
-                        </View>
                       </View>
+                    </KeyboardAvoidingView>
                   </TouchableWithoutFeedback>
-                  </KeyboardAvoidingView>
+                 
               </Modal>
             );
     }
