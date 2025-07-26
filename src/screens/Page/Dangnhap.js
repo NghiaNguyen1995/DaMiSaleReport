@@ -17,15 +17,16 @@ import { icons, COLORS, FONTS } from '../../../constants';
 import { Alert } from 'react-native';
 import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
 import { NameScreen } from '../../../constants/NameScreen';
-import { buttonStyle, containerInput } from '../../../constants/stylechung';
+import { buttonStyle, containerInput, ModalNewStyle, ModalStyle } from '../../../constants/stylechung';
 
 import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder, createFolderDrive, createJsonFile, getContentFile, getSharedParentFolder } from '../../Function/GoogleDrive/GetListFileGGDrive';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetLogin } from '../../api/SalesManager';
+import { GetLogin, ResetPassword } from '../../api/SalesManager';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { pick, types } from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import { getBaseURL } from '../../api/ApiManager';
+import { Modal } from 'react-native-paper';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -34,16 +35,39 @@ const SIGN_IN = 'SIGN_IN'
 
 export default function Login({ navigation }) {
     const [Token, setToken] = useState('')
-    const [page, setPage] = useState(SIGN_IN);
 
     const [tencongty,settencongty]=useState()
-    const [visibleLoadData,setvisibleLoadData]=useState(false)
+    
+    const [showTitle, setShowTitle] = useState(false);
+    const [showBody, setShowBody] = useState(false);
+    const [showFooter, setShowFooter] = useState(false);
+
+    const [sUsername,setsUsername]=useState('')
+    const [sPassword,setsPassword]=useState('')
+    const [mViewDoiMatKhau,setmViewDoiMatKhau]=useState(false);
+    
+    const [modalthongbao,setmodalthongbao] = useState(false);
+    const [loaithongbao,setloaithongbao] = useState('');
+
+    const [visileLoad,setvisileLoad]= useState(false);
 
     useEffect(() => {
-        RequestUserPermission()
-        CheckApplicationPermission()
+
+        Platform.OS==='ios'?null:RequestUserPermission()
+        Platform.OS==='ios'?null:CheckApplicationPermission()
+        Platform.OS==='ios'?null: GetthongbaoFirebase()
+        
         Getappcaption()
-        GetthongbaoFirebase()
+
+        const t1 = setTimeout(() => setShowTitle(true), 100);
+        const t2 = setTimeout(() => setShowBody(true), 200);
+        const t3 = setTimeout(() => setShowFooter(true), 300);
+
+        return () => {
+          clearTimeout(t1);
+          clearTimeout(t2);
+          clearTimeout(t3);
+        }
     }, []);
    
     //Yêu cầu quyền thiết bị để lấy Token trong IOS
@@ -146,7 +170,7 @@ export default function Login({ navigation }) {
 
     const date = new Date()
 
-    const Title = ({ page, setPage }) => {
+    const Title = () => {
 
       const [urlImage, setUrlImage] = useState('');
 
@@ -211,15 +235,13 @@ export default function Login({ navigation }) {
         )
     }
     
-    const Body = () => {
+    const Body = ({setsUsername,setsPassword}) => {
 
         const [manv, setmanv] = useState('');      
-        const [pw,setpw] = useState('')
+        const [pw,setpw] = useState('');
+
         const [seePassword, setSeePassword] = useState(true);
-        const [modalthongbao,setmodalthongbao] = useState(false)
-        const [loaithongbao,setloaithongbao] = useState('')
-        const [visileLoad,setvisileLoad]= useState(false)
-        
+
         useEffect(() => { 
             fGetRememberTaikhoan()
         },[navigation]);
@@ -230,17 +252,17 @@ export default function Login({ navigation }) {
           setvisileLoad(true)
           
           if(manv == '' && pw == ''){
-                setloaithongbao("NoUsernamePasswordInput")
-                setmodalthongbao(true)
-                return setvisileLoad(false)
+              setloaithongbao("NoUsernamePasswordInput")
+              setmodalthongbao(true)
+              return setvisileLoad(false)
           }else if(manv ==''){
-                setloaithongbao("NoUsernameInput")
-                setmodalthongbao(true)
-                return setvisileLoad(false)
+              setloaithongbao("NoUsernameInput")
+              setmodalthongbao(true)
+              return setvisileLoad(false)
           }else if(pw == ''){
-                setloaithongbao("NoPassInput")
-                setmodalthongbao(true)
-                return setvisileLoad(false)
+              setloaithongbao("NoPassInput")
+              setmodalthongbao(true)
+              return setvisileLoad(false)
           }else{
               fGetLoginAPI()
           }
@@ -256,47 +278,63 @@ export default function Login({ navigation }) {
                 if (user && typeof user === 'object') {
                     user.ID = manv.toUpperCase();  
                     user.Password = pw;  
-                    console.log('Có ObjectData: ', user);
-                    AsyncStorage.setItem('user', JSON.stringify(user));
+                    fSetStorageUserPass(user);
+                    //AsyncStorage.setItem('user', JSON.stringify(user));
                     navigation.navigate(NameScreen.TrangChu, user);
                 } else {
-                    console.log('Không Có ObjectData');
                     const defaultUser = {
                         'ID': manv.toUpperCase(),
                         'UserName': manv.toUpperCase(),
                         'CompanyName': manv.toUpperCase(),
                         'Password': pw
                     };
-                    AsyncStorage.setItem('user', JSON.stringify(defaultUser));
+                    fSetStorageUserPass(defaultUser);
+                    //AsyncStorage.setItem('user', JSON.stringify(defaultUser));
                     navigation.navigate(NameScreen.TrangChu, defaultUser);
                 }
             }else{
                 if(data.status==401){
                     setloaithongbao('ErrorPassword');
-                    setmodalthongbao(true);
+                    setTimeout(() => {
+                      setmodalthongbao(true);
+                    }, 600);
                 }else if(data.status==500){
                     setloaithongbao('NoRegistAccount');
-                    setmodalthongbao(true);
+                    setTimeout(() => {
+                      setmodalthongbao(true);
+                    }, 600);
                 }
  
             }
           })
            
         }
+
+        async function fSetStorageUserPass(user){
+          setsUsername(manv.toUpperCase());
+          setsPassword(pw);
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+        }
        
         async function fGetRememberTaikhoan(){
             let usrRemember = JSON.parse(await AsyncStorage.getItem('user'))
             if(manv!=null && pw!=null){
-                setmanv(usrRemember.ID)
-                setpw(usrRemember.Password)
+
+                //Biến bên trong Component
+                setmanv(usrRemember.ID);
+                setpw(usrRemember.Password);
+
+                //Biến bên ngoài truyền vào Component Body
+                setsUsername(usrRemember.ID);
+                setsPassword(usrRemember.Password);
             }
         }
 
         return (
-
+       
           <View style={{...containerInput.ctnInput,height:'100%',marginTop:50,alignItems:'center'}}>
             
-            
+              
             <View style={{ ...containerInput.viewItem,width:'90%',height:50}}> 
                 <TextInput
                   style={{ ...containerInput.textLabel, width: windowWidth * 0.85 }}
@@ -330,6 +368,7 @@ export default function Login({ navigation }) {
 
             </View>
             
+            
             <View style={{...buttonStyle.viewButton,paddingTop:windowHeight/60}}>   
                 <TouchableOpacity 
                     style={{...buttonStyle.buttonOK, width:windowWidth*0.85,flexDirection:"row",alignItems:'center'}} 
@@ -339,10 +378,8 @@ export default function Login({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            {modalthongbao==true? FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,''):null}
-            {visileLoad?<ViewLoadingAnimation/>:null}
           </View>
-          
+
         );
     }
    
@@ -352,23 +389,18 @@ export default function Login({ navigation }) {
 
           <View style={{ flexDirection: 'row',justifyContent:'space-between'}}>
         
-            <TouchableOpacity disabled={visibleLoadData} onPress={() => { navigation.navigate(NameScreen.Regist)}} style={{ ...styles.box }}>
+            <TouchableOpacity disabled={false} onPress={() => { 
+                //navigation.navigate(NameScreen.Regist) 
+                setmViewDoiMatKhau(true);
+              }} style={{ ...styles.box }}>
               <Image source={icons.user_dangky}
                 resizeMode='contain'
                 
                 style={{ width: 0.1 * (windowWidth - 60), height: 30, tintColor: 'white' }}
-              /><Text style={{ color: 'white' }}>Đăng ký</Text>
+              /><Text style={{ color: 'white',textAlign:'center' }}>Mật khẩu</Text>
             </TouchableOpacity>
-            
-            {/*<TouchableOpacity disabled={visibleLoadData} onPress={() => { Linking.openURL('https://www.youtube.com/watch?v=5zlECMmQpqI') }} style={{ ...styles.box }}>
-              <Image source={icons.huongdan}
-                resizeMode='contain'
-                
-                style={{ width: 0.1 * (windowWidth - 60), height: 30, marginLeft: 18, tintColor: 'white' }}
-              /><Text style={{ color: 'white' }}>Hướng dẫn</Text>
-            </TouchableOpacity>*/}
-
-            <TouchableOpacity disabled={visibleLoadData} onPress={() => {navigation.navigate(NameScreen.Dangkyurl)}} style={styles.box}>
+       
+            <TouchableOpacity disabled={false} onPress={() => {navigation.navigate(NameScreen.Dangkyurl)}} style={styles.box}>
               <Image source={icons.website}
                 resizeMode='contain'
                 style={{ width: 0.1 * (windowWidth - 60), height: 30, tintColor: 'white',alignContent:'center' }}
@@ -376,7 +408,7 @@ export default function Login({ navigation }) {
               <Text style={{ color: 'white' }}>Đăng ký URL</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity disabled={visibleLoadData} onPress={() => {/*testSo()*/Linking.openURL('https://damivn.com/lien-he/')}} style={{ ...styles.box }}>
+            <TouchableOpacity disabled={false} onPress={() => {/*testSo()*/Linking.openURL('https://damivn.com/lien-he/')}} style={{ ...styles.box }}>
               <Image source={icons.support}
                 resizeMode='contain'
                 style={{ width: 0.1 * (windowWidth - 60), height: 30, tintColor: 'white' }}
@@ -391,86 +423,183 @@ export default function Login({ navigation }) {
 
     //Ẩn bàn phím khi nhấn bất kỳ điểm nào trên View
     const DismissKeyboard =({children})=> (
-      <TouchableWithoutFeedback onPress={()=>Keyboard.dismiss()}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           {children}
       </TouchableWithoutFeedback>
     );
 
+    const ViewDoiMatKhau = ({ sUsername, sPassword, mViewDoiMatKhau, setmViewDoiMatKhau }) => {
+            const [msUser, setmsUser] = useState(sUsername);
+            const [msPass, setmsPass] = useState(sPassword);
+            const [msPassNew, setmsPassNew] = useState('');
+
+            useEffect(() => {
+              setmsUser(sUsername);
+              setmsPass(sPassword);
+            }, [sUsername, sPassword]);
+
+            function fResetPassword(){
+                if(msUser == '' && msPass == '' && msPassNew==''){
+                    setloaithongbao("NoUsernamePasswordInput");
+                    setmodalthongbao(true);
+                    return setvisileLoad(false);
+                }else if(msUser ==''){
+                    setloaithongbao("NoUsernameInput");
+                    setmodalthongbao(true);
+                    return setvisileLoad(false);
+                }else if(msPass == '' || msPassNew==''){
+                    setloaithongbao("NoPassInput");
+                    setmodalthongbao(true);
+                    return setvisileLoad(false);
+                }else{
+                    fRePassAPI()
+                }           
+            }
+            
+            async function fRePassAPI() {
+                let data = {
+                      'userID': msUser.toUpperCase(),
+                      'oldPassword':msPass,
+                      'newPassword':msPassNew
+                }
+                await ResetPassword(data).then((data)=>{
+                  if(data.status==200){
+                    setloaithongbao('UpdatePasswordSuccess');
+                    setTimeout(() => {
+                      setmViewDoiMatKhau(false);
+                      setmodalthongbao(true);
+                    }, 500);
+                  }else{
+                    setloaithongbao('UpdatePasswordFail');
+                    setTimeout(() => {            
+                      setmodalthongbao(true);
+                    }, 500);
+                  }
+                })
+            }
+
+            return(
+              <Modal visible={mViewDoiMatKhau} animationType="fade" transparent>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                  //keyboardVerticalOffset={Platform.OS === 'ios' ? 200 : 200}
+                >
+                  <TouchableWithoutFeedback onPress={() => {
+                      Keyboard.dismiss();
+                      setmViewDoiMatKhau(false);                 
+                    }}>                  
+                      <View style={{...ModalStyle.centeredView,flex:0,height:'100%'}}>
+                        <View style={{...ModalStyle.Modal}}>
+                          
+
+                          <Text style={styles.title}>ĐỔI MẬT KHẨU</Text>
+
+                          <TextInput
+                            style={styles.textInput}
+                            placeholder="Tài khoản"
+                            value={msUser}
+                            onChangeText={setmsUser}
+                            autoCapitalize="characters"
+                            placeholderTextColor="#999"
+                          />
+
+                          <TextInput
+                            style={styles.textInput}
+                            placeholder="Nhập mật khẩu cũ"
+                            value={msPass}
+                            onChangeText={setmsPass}
+                            secureTextEntry
+                            placeholderTextColor="#999"
+                          />
+
+                          <TextInput
+                            style={styles.textInput}
+                            placeholder="Nhập mật khẩu mới"
+                            value={msPassNew}
+                            onChangeText={setmsPassNew}
+                            secureTextEntry
+                            placeholderTextColor="#999"
+                          />
+
+                          <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                              style={[styles.button, { backgroundColor: '#1976D2' }]}
+                              onPress={() => {
+                                fResetPassword();
+                              }}
+                            >
+                              <Text style={styles.buttonText}>Cập nhập</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={[styles.button, { backgroundColor: COLORS.red }]}
+                              onPress={() => setmViewDoiMatKhau(false)}
+                            >
+                              <Text style={styles.buttonText}>Huỷ</Text>
+                            </TouchableOpacity>
+                          </View>
+                          
+                        </View>
+                      </View>
+                  </TouchableWithoutFeedback>
+                  </KeyboardAvoidingView>
+              </Modal>
+            );
+    }
+
     return ( 
       <DismissKeyboard>
-          <KeyboardAvoidingView 
-              style={{ flex: 1, backgroundColor: 'white' }} 
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200} // Điều chỉnh offset tùy thuộc vào kích thước của bàn phím
-          >
-            
-              <View style={{ height: '100%', width: '100%', flex: 1}}>
-                <ImageBackground source={date.getMonth()+1 == 1 ?icons.backgroundtet:icons.backgroundchuan}
-                  resizeMode='stretch' style={{ flex: 0 }}>
-                      <SafeAreaView>
-                          <View style={{ height: '25%', width: '100%'}}>
-                            <Title page={page} setPage={setPage} />
-                          </View>
-                          
-                          <View style={{ height: '65%', width: '100%'}}>   
-                              <Body />
-                          </View>
-                        
-                          <View style={{ height: '10%'}}>   
-                              <Footer />
-                          </View>
-                          
-                      </SafeAreaView>
-                </ImageBackground>
-              </View>
-          </KeyboardAvoidingView>
+        <KeyboardAvoidingView
+          style={{ flex: 1, backgroundColor: 'white' }}
+          //behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          //keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
+            <ImageBackground
+              source={date.getMonth() + 1 === 1 ? icons.backgroundtet : icons.backgroundchuan}
+              resizeMode="cover"
+              style={{ flex: 1 }}
+            >
+              <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 2.5 }}>
+                  {showTitle && <Title />}
+                </View>
+
+                <View style={{ flex: 6.5 }}>
+                  {showBody && (
+                    <Body 
+                      setsUsername={setsUsername} 
+                      setsPassword={setsPassword} 
+                    />
+                  )}
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  {showFooter && <Footer />}
+                </View>
+
+                {mViewDoiMatKhau? 
+                  <ViewDoiMatKhau
+                      sUsername={sUsername}
+                      sPassword={sPassword}
+                      mViewDoiMatKhau={mViewDoiMatKhau}
+                      setmViewDoiMatKhau={setmViewDoiMatKhau}
+                  />
+                :null}
+                {modalthongbao==true? FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,''):null}
+                {visileLoad?<ViewLoadingAnimation/>:null}
+               
+              </SafeAreaView>
+            </ImageBackground>   
+        </KeyboardAvoidingView>
       </DismissKeyboard>
+      
       
     );
   
   }
 
   const styles = StyleSheet.create({
-    indicatorWrapper: {
-      marginTop:-40,
-      flex: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      
-    },
-    indicator: {},
-    indicatorText: {
-      fontSize: 18,
-      marginTop: 0,
-      color: 'black'
-    },
-    container: {
-      flex: 1,
-      //  justifyContent: 'center',
-      marginHorizontal: 20,
-      marginTop: 25,
-    
-    },
-    scrollView: {
-      flexGrow: 1,
-      justifyContent: 'flex-end', // Đảm bảo footer luôn nằm ở dưới cùng
-    },
-    wrapperInput: {
-      borderWidth: 0.5,
-      borderRadius: 5,
-      borderColor: 'grey',
-      marginTop: 10,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    input: {
-      //marginLeft:90,
-      //color:COLORS.dialogTitle,
-      //fontSize:20,
-      //marginRight:20
-      fontSize: 15, width: windowWidth * 0.75,
-      color: 'gray'
-    },
+ 
     wrapperIcon: {
       position: 'absolute',
       right: 0,
@@ -480,49 +609,52 @@ export default function Login({ navigation }) {
       width: 30,
       height: 24,
     },
-    button: {
-      //padding: 12,
-      height:48,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: COLORS.app.buttonLogin,
-      borderRadius: 5,
-      marginTop: 40,
-      width: windowWidth * 0.75
-    },
-    button1: {
-      padding: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: COLORS.dialogTitle,
-      borderRadius: 20,
-      marginTop: 5,
-      width: windowWidth * 0.3
-    },
-    buttonDisable: {
-      padding: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'gray',
-      borderRadius: 5,
-      marginTop: 25,
-    },
-    text: {
-      color: 'white',
-      fontWeight: 'bold',
-      fontSize: 20
-    },
-    textFailed: {
-      alignSelf: 'flex-end',
-      marginRight: 35,
-      marginTop: 10
-      //color: 'red',
-    },
     box: {
       paddingLeft: 25,
       paddingRight: 20,
       paddingTop: 6,
       alignItems:'center'
+    },
+
+
+    //Modal Đổi mật khẩu
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 16,
+      textAlign: 'center',
+      color: '#333',
+      paddingTop: 16
+    },
+    textInput: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 8,
+      marginHorizontal: 16,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      marginBottom: 12,
+      backgroundColor: '#F9F9F9',
+      color: '#000'
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 20,
+      gap: 12,
+      marginHorizontal: 16,
+      marginBottom: 16
+    },
+    button: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    buttonText: {
+      color: '#fff',
+      fontWeight: '600',
+      fontSize: 16,
     }
   });
 

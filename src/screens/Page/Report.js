@@ -8,7 +8,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Import từ các file khác
-import { containerFooter, containerHeader, containerInput, containerView, GridStyle} from '../../../constants/stylechung'
+import { containerHeader, containerInput, containerView, GridStyle} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
 import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -68,7 +68,6 @@ export default function Report({navigation,route}) {
     const defaultKeysCongnoRutgon = ["AccountID", "TradeName", "CnvEndDebit", "CnvEndCredit"];
 
     
-
     const [visibleKeys, setVisibleKeys] = useState(route.params.id == "baocaotonkho" ? defaultKeysKhoRutGon : defaultKeysCongnoRutgon);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
@@ -135,57 +134,60 @@ export default function Report({navigation,route}) {
 
         return (
             <Modal visible={modalVisible} animationType="fade" transparent={true}>
-                <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
-                    <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM THÊM</Text>
+                <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                    <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
+                        <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM THÊM</Text>
 
-                    <ScrollView style={{maxHeight: 300}}>
-                        {allKeys.map(key => (
-                        <TouchableOpacity
-                            key={key}
+                        <ScrollView style={{maxHeight: 300}}>
+                            {allKeys.map(key => (
+                            <TouchableOpacity
+                                key={key}
+                                onPress={() => {
+                                if (selectedKeys.includes(key)) {
+                                    setSelectedKeys(selectedKeys.filter(k => k !== key));
+                                } else {
+                                    setSelectedKeys([...selectedKeys, key]);
+                                }
+                                }}
+                                style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginBottom: 5,
+                                }}>
+                                <View 
+                                style={{
+                                    height: 20,
+                                    width: 20,
+                                    borderWidth: 1,
+                                    borderColor: '#333',
+                                    backgroundColor: selectedKeys.includes(key) ? '#333' : 'white',
+                                    marginRight: 10,
+                                }}
+                                />
+                                <Text>{clsFunc.fRenameHeaderTable(key)}</Text>
+                            </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 15}}>
+                            <TouchableOpacity onPress={() => setModalVisible(false)} style={{padding: 10}}>
+                            <Text>Hủy</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
                             onPress={() => {
-                            if (selectedKeys.includes(key)) {
-                                setSelectedKeys(selectedKeys.filter(k => k !== key));
-                            } else {
-                                setSelectedKeys([...selectedKeys, key]);
-                            }
+                                onConfirm(selectedKeys);
                             }}
-                            style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginBottom: 5,
-                            }}>
-                            <View 
-                            style={{
-                                height: 20,
-                                width: 20,
-                                borderWidth: 1,
-                                borderColor: '#333',
-                                backgroundColor: selectedKeys.includes(key) ? '#333' : 'white',
-                                marginRight: 10,
-                            }}
-                            />
-                            <Text>{clsFunc.fRenameHeaderTable(key)}</Text>
-                        </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 15}}>
-                        <TouchableOpacity onPress={() => setModalVisible(false)} style={{padding: 10}}>
-                        <Text>Hủy</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                        onPress={() => {
-                            onConfirm(selectedKeys);
-                        }}
-                        style={{padding: 10}}
-                        >
-                        <Text style={{color: 'blue'}}>Xác nhận</Text>
-                        </TouchableOpacity>
+                            style={{padding: 10}}
+                            >
+                            <Text style={{color: 'blue'}}>Xác nhận</Text>
+                            </TouchableOpacity>
+                        </View>
+                        </View>
                     </View>
-                    </View>
-                </View>
+                </TouchableWithoutFeedback>
             </Modal>
+           
         );
     };
 
@@ -276,6 +278,7 @@ export default function Report({navigation,route}) {
             </View>
         )
     }
+    
     const ComponentInput=()=>{
         const [currentOpen, setCurrentOpen] = useState(null);
 
@@ -290,12 +293,12 @@ export default function Report({navigation,route}) {
                             setcalendarSelectedDate(startDay);
                             setopenViewCalendar(true);
                         }} 
-                        style={{flexDirection:'row'}}>         
+                        style={{flexDirection:'row',width:'100%'}}>         
                             <Image 
                                 source={icons.fromdate}
                                 style={{tintColor:COLORS.lime,height:25,width:25}}
                             />  
-                            <Text style={{...containerInput.textvalue,paddingTop:3,paddingLeft:10}}>TỪ NGÀY: {moment(startDay).format('DD/MM/YYYY')}</Text>
+                            <Text style={{paddingTop:3,paddingLeft:10}}>TỪ NGÀY: {moment(startDay).format('DD/MM/YYYY')}</Text>
                     </TouchableOpacity>
                     <Icon 
                         name="star"
@@ -312,12 +315,12 @@ export default function Report({navigation,route}) {
                             setcalendarSelectedDate(toDay);
                             setopenViewCalendar(true);
                         }} 
-                        style={{flexDirection:'row'}}>         
+                        style={{flexDirection:'row',width:'100%'}}>         
                             <Image 
                                 source={icons.todate}
                                 style={{tintColor:COLORS.red,height:25,width:25}}
                             />  
-                            <Text style={{...containerInput.textvalue,paddingTop:3,paddingLeft:10}}>ĐẾN NGÀY: {moment(toDay).format('DD/MM/YYYY')}</Text>
+                            <Text style={{paddingTop:3,paddingLeft:10}}>ĐẾN NGÀY: {moment(toDay).format('DD/MM/YYYY')}</Text>
                     </TouchableOpacity>
                     <Icon 
                         name="star"
@@ -646,79 +649,65 @@ export default function Report({navigation,route}) {
 
     //#region "Gồm View lịch và function chọn ngày"
     "View Calendar chọn ngày"
-    const ViewCalendar=()=>{
+    const ViewCalendar=({openViewCalendar,setopenViewCalendar})=>{
         return(
-        <Modal visible={openViewCalendar} animationType="fade" transparent={true}> 
-            <View style={[style.centeredView,style.modalView]}>
-                
-                <View style={style.modalHeader}>
-                    
-                    <TouchableOpacity onPress={()=>{setopenViewCalendar(false)}}>
-                        <Icon 
-                            name='window-close'
-                            size={22}
-                            style={{textAlignVertical:'center',color:'white'}}
-                        />
-                    </TouchableOpacity>
-                    
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'white'}}>CHỌN NGÀY</Text>
+            <Modal visible={openViewCalendar} animationType="fade" transparent={true}>
+                <TouchableWithoutFeedback onPress={() => setopenViewCalendar(false)}>
+                    <View style={styles.overlay}>
+                    <TouchableWithoutFeedback onPress={() => {}}>
+                        <View style={styles.modalContainer}>
+                        
+                        {/* Header */}
+                        <View style={styles.modalHeader}>
+                            <TouchableOpacity onPress={() => setopenViewCalendar(false)}>
+                            <Icon
+                                name="window-close"
+                                size={22}
+                                color="white"
+                            />
+                            </TouchableOpacity>
 
-                    <TouchableOpacity onPress={()=>{
-                        setstartDay(new Date());
-                        setcalendarSelectedDate(new Date());
-                        setopenViewCalendar(false);
-                    }}>
-                        <Text style={{textAlign:'right',textAlignVertical:'center',fontSize:15,color:'white'}}>Hôm{'\n'}nay</Text>
-                    </TouchableOpacity>
-            
-                </View>
-                
-                <CalendarPicker
-                    startFromMonday={true}
-                    allowRangeSelection={false}
-                    minDate={new Date(1995, 1, 1)}
-                    maxDate={new Date(2050, 12, 31)} 
-                    initialDate={calendarSelectedDate}
-                    selectedStartDate={calendarSelectedDate}
-                    weekdays={
-                    [
-                        'Thứ 2', 
-                        'Thứ 3', 
-                        'Thứ 4', 
-                        'Thứ 5', 
-                        'Thứ 6', 
-                        'Thứ 7', 
-                        'Chủ nhật'
-                    ]}
-                    months={[
-                        'Tháng 1',
-                        'Tháng 2',
-                        'Tháng 3',
-                        'Tháng 4',
-                        'Tháng 5',
-                        'Tháng 6',
-                        'Tháng 7',
-                        'Tháng 8',
-                        'Tháng 9',
-                        'Tháng 10',
-                        'Tháng 11',
-                        'Tháng 12'
-                    ]}
-                    previousTitle="Trước"
-                    nextTitle="Sau"
-                    todayBackgroundColor={COLORS.yellow}
-                    selectedDayColor="#66ff33"
-                    selectedDayTextColor="#000000"
-                    scaleFactor={380} //375 là kích
-                    textStyle={{
-                        fontFamily: 'Cochin',
-                        color: '#000000',
-                    }}
-                    onDateChange={fOnDateChange}
-                />
-            
-            </View>
-        </Modal>
+                            <Text style={styles.headerTitle}>CHỌN NGÀY</Text>
+
+                            <TouchableOpacity onPress={() => {
+                            const today = new Date();
+                            setstartDay(today);
+                            setcalendarSelectedDate(today);
+                            setopenViewCalendar(false);
+                            }}>
+                            <Text style={styles.todayText}>Hôm{'\n'}nay</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Calendar */}
+                        <CalendarPicker
+                            startFromMonday={true}
+                            allowRangeSelection={false}
+                            minDate={new Date(1995, 1, 1)}
+                            maxDate={new Date(2050, 12, 31)}
+                            initialDate={calendarSelectedDate}
+                            selectedStartDate={calendarSelectedDate}
+                            weekdays={[
+                            'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'
+                            ]}
+                            months={[
+                            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+                            ]}
+                            previousTitle="Trước"
+                            nextTitle="Sau"
+                            todayBackgroundColor={COLORS.yellow}
+                            selectedDayColor="#66ff33"
+                            selectedDayTextColor="#000"
+                            scaleFactor={380}
+                            textStyle={{ color: '#000' }}
+                            onDateChange={fOnDateChange}
+                        />
+                        </View>
+                    </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         )
     }
 
@@ -745,11 +734,14 @@ export default function Report({navigation,route}) {
 
     
     return (
-        <TouchableWithoutFeedback onPress={()=>{ Keyboard.dismiss() }} accessible={false}>
+        <TouchableWithoutFeedback onPress={()=>{ 
+            Keyboard.dismiss()
+        }} accessible={false}>
             <KeyboardAvoidingView 
                 style={{ flex: 1, backgroundColor: 'white' }} 
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200}>
+                //behavior={Platform.OS === 'ios' ? 'height' : 'height'} 
+                //keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200}*/
+                >
 
                 <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
                     
@@ -842,7 +834,12 @@ export default function Report({navigation,route}) {
                         />
                     :null}
 
-                    {openViewCalendar ? <ViewCalendar />:null}
+                    {openViewCalendar == true ? 
+                        <ViewCalendar 
+                            openViewCalendar={openViewCalendar}
+                            setopenViewCalendar={setopenViewCalendar}
+                        />
+                        :null}
                     {modalthongbao==true?FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData):null}
                     {visibleLoadData==true?
                         <ViewLoadingAnimation 
@@ -855,39 +852,47 @@ export default function Report({navigation,route}) {
     )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
     // Style cho Modal Lịch
-    centeredView: {
-      justifyContent:'center',
-      width: 'auto',
-      marginLeft:10,
-      marginRight:10,
-      backgroundColor: 'white',
-      marginTop: 200,
-      
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)', // nền mờ
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    modalView: {
-      borderRadius: 12,    
-      shadowColor: COLORS.lightGray,
-      shadowOffset: {
-        width: 4,
-        height: 4
-      },
-      borderWidth: 1,
-      shadowOpacity: 20,
-      shadowRadius: 10,
-      elevation: 4,
+    modalContainer: {
+        width: '95%',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        overflow: 'hidden',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        paddingBottom: 15,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: COLORS.skin2.bgfooter,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+    },
+    headerTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    todayText: {
+        fontSize: 14,
+        color: 'white',
+        textAlign: 'right',
+    },
 
-    },
-    modalHeader:{
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        backgroundColor:COLORS.skin2.bgfooter,
-        paddingBottom:10,
-        padding:5,
-        borderBottomWidth:1,
-        borderTopLeftRadius:10,
-        borderTopRightRadius:10,
-    },
+    
+
 });

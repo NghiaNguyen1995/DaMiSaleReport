@@ -353,6 +353,7 @@ export const containerInput={
     },
     textInput:{
         fontSize:15,
+        width:"100%"
     },
     iconStar:{
         position: 'absolute',
@@ -466,11 +467,11 @@ export const containerFooter={
     },
 
     footerCaption:{
-            fontSize:14,
-            color:"white",
-            textAlign:'center',
-            padding:10,
-            textAlignVertical:'center'
+        fontSize:14,
+        color:"white",
+        textAlign:'center',
+        padding:10,
+        textAlignVertical:'center'
     }
 }
 
@@ -539,7 +540,7 @@ export const footerthongke =(data)=>{
             )
         }else if(data.loaithongke=="thongkengay"){
             return(
-                <View style={{...containerFooter.ctnFooter,justifyContent:'center'}}>
+                <View style={{...containerFooter.ctnFooter,justifyContent:'center',alignItems:'center'}}>
                     <Text style={{...containerFooter.footerCaption}}>Ngày: {data1}</Text>
                 </View>
             )
@@ -614,7 +615,30 @@ export const ModalNewStyle={
         borderRadius: 8,
         padding: 5,
         maxHeight: 'auto',
-    }
+    },
+    
+    modalOverlay1: {
+        flex:1,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 0,
+    },
+    innerOverlay: {
+        width: '90%',
+        alignItems: 'center',
+    },
+    modalContainer1: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        paddingVertical: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        elevation: 10,
+    },
 }
 
 export const GridStyle = (key) => ({

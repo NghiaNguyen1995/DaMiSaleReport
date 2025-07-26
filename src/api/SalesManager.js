@@ -165,6 +165,23 @@ export const GetLogin = async(username,password,setload) => {
       return handleSearch(error);
     }
 }
+// Login
+export const ResetPassword = async(data) => {
+    try {
+      const result = await DAMI_API('ResetPassword', {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+            'DaMiPartnerGUID': DaMiHeader[0].DaMiPartnerGUID,
+            'DaMiPartnerToken': DaMiHeader[0].DaMiPartnerToken
+          },
+          data: JSON.stringify(data)
+      });
+      return result;
+    } catch (error) {
+      return handleSearch(error);
+    }
+}
 
 // GetSalesVoucher: Phiếu giao hàng
 export const GetSalesVoucher = async(vVoucherDate,sVoucherNo,sCustomerName,sSalesManID,setload) => {
@@ -206,6 +223,7 @@ export const GetGeneralSalesByDate = async(vFromday,vToDay,sSalesManID,sItemGrou
       return handleSearch(error)
     }
 }
+
 
 
 

@@ -93,10 +93,12 @@ export class clsFunc {
       ItemColor: "Màu sắc",
       Specification: "Quy cách",
       Quantity: "Số lượng",
+      QuantityByVoucher:"Số lượng",
       Quantity2: "Số lượng phụ",
       QtyCay: "Số cây",
       QtyMet: "Số mét",
       ConvertPrice: "Đơn giá",
+      CnvPriceByVoucher: "Đơn giá",
       ConvertPrice2: "Đơn giá quy đổi phụ",
       CnvPriceCay: "Đơn giá theo cây",
       CnvPriceMet: "Đơn giá theo mét",
@@ -110,6 +112,7 @@ export class clsFunc {
       SalesManID: "Mã NV",
       SalesManName: "Tên NV",
       ItemGroupID: "Mã\nnhóm hàng",
+      CreatedDate:"Ngày lập",
     };
     return mapping[key] || key;
   }
