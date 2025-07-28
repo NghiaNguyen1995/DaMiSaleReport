@@ -756,18 +756,18 @@ export default function Report({navigation,route}) {
                             >
                                 <View style={{...containerView('report',data)}}>
                                     {/* Header */}
-                                    <View style={{...GridStyle('').headerRow}}>
+                                    <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
                                         {keys.map(key => (
-                                            <Text key={key} style={{...GridStyle(key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                            <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
                                         ))}
                                     </View>
 
                                     {/* Filter row */}
-                                    <View style={{...GridStyle('').filterRow}}>
+                                    <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
                                         {keys.map(key => (
                                         <TextInput                          
                                             key={key}
-                                            style={{...GridStyle(key).filterInput}}
+                                            style={{...GridStyle(visibleKeys.length,key).filterInput}}
                                             placeholder={''}
                                             value={filters[key]}
                                             onChangeText={value => fHandleFilterChange(key, value)}
@@ -794,11 +794,11 @@ export default function Report({navigation,route}) {
                                             if (!show) return null;
 
                                             return (
-                                            <View style={{...GridStyle('').dataRow}} >
+                                            <View style={{...GridStyle(visibleKeys.length,'').dataRow}} >
                                                 {keys.map(key => (
                                                     <Text 
                                                         key={key} 
-                                                        style={{...GridStyle(key).dataCell}}
+                                                        style={{...GridStyle(visibleKeys.length,key).dataCell}}
                                                         onPress={()=>{}}>
                                                             {item[key]}
                                                     </Text>
@@ -808,9 +808,9 @@ export default function Report({navigation,route}) {
                                         }}
                                         ListFooterComponent={() =>
                                             filteredData.length > 0 ? (
-                                                <View style={{...GridStyle('').dataRow}}>
+                                                <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                     {keys.map(key => (
-                                                        <Text key={key} style={{...GridStyle(key).dataCell,fontWeight:'bold',color:'black'}}>
+                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
                                                             {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
                                                         </Text>
                                                     ))}

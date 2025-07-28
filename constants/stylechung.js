@@ -641,7 +641,7 @@ export const ModalNewStyle={
     },
 }
 
-export const GridStyle = (key) => ({
+export const GridStyle = (totalColumn,key) => ({
     //Dòng Header
     headerRow: {
         flexDirection: 'row',
@@ -649,7 +649,7 @@ export const GridStyle = (key) => ({
         backgroundColor: '#f0f0f0',
     },
     headerCell: {
-        width: fSetWidthRowFlatListItem(key),
+        width: fSetWidthRowFlatListItem(totalColumn,key),
         fontWeight: 'bold',
         padding: 5,
         borderWidth: 1,
@@ -662,7 +662,7 @@ export const GridStyle = (key) => ({
         flexDirection: 'row',
     },
     filterInput: {
-        width: fSetWidthRowFlatListItem(key),
+        width: fSetWidthRowFlatListItem(totalColumn,key),
         borderWidth: 1,
         borderColor: '#ccc',
         padding: 3,
@@ -672,7 +672,7 @@ export const GridStyle = (key) => ({
         flexDirection: 'row',
     },
     dataCell: {
-        width: fSetWidthRowFlatListItem(key),
+        width: fSetWidthRowFlatListItem(totalColumn,key),
         padding: 5,
         borderWidth: 1,
         borderColor: '#eee',
@@ -692,8 +692,27 @@ export function fSetTextAlignForText(key){
     }
 }
 //115 + 50 + 115 = 280
-export function fSetWidthRowFlatListItem(key){
-    if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('NoteDetails')){
+export function fSetWidthRowFlatListItem(totalColumn,key){
+    // Nếu totalColumn là 4, xử lý theo key chi tiết
+    if (totalColumn >= 4) {
+        if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) {
+        return 100; // tên hoặc ghi chú
+        } else if (key.includes('ID') || key.includes('RowNumber') || key.includes('UnitName')) {
+        return 60; // ID, STT, đơn vị
+        } else if (key.includes('Date') || key.includes('VoucherNo')) {
+        return 98; // ngày, số chứng từ
+        } else {
+        return 120; // các cột khác
+        }
+    }
+
+    // Nếu totalColumn là 1, 2 hoặc 3 thì chia đều theo độ rộng màn hình
+    if (totalColumn >= 1 && totalColumn <= 3) {
+        return Math.floor(windowWidth / totalColumn);
+    }
+
+    return 100;
+    /*if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('NoteDetails')){
         return 100//return 115;
     }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('UnitName')){
         return 60//return 50;
@@ -702,7 +721,7 @@ export function fSetWidthRowFlatListItem(key){
     }
     else{
         return 120//return 115;
-    }
+    }*/
 }
 //#endregion
 

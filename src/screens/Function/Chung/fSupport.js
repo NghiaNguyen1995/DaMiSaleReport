@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { Platform } from 'react-native';
 
 export class clsFunc {
 
@@ -61,6 +62,7 @@ export class clsFunc {
       ItemID: "Mã hàng",
       ItemName: "Tên hàng",
       UnitName: "ĐVT",
+      UnitNameForVoucher:"ĐVT",
       WareHouseID: "Kho",
       BegInvQuantity: "Tồn đầu (kg)",
       BegInvQuantity2: "Tồn đầu (cây)",
@@ -206,4 +208,14 @@ export class clsFunc {
     }
     
   }  
+
+  static fSetTimeToOpenModalThongBao(setOpenModal,giatri){
+    if(Platform.OS==='ios'){
+      setTimeout(() => {
+        setOpenModal(giatri);
+      }, 600);
+    }else{
+      setOpenModal(giatri);
+    }
+  }
 }

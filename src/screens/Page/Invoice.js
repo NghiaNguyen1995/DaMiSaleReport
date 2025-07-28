@@ -64,7 +64,7 @@ export default function Invoice({navigation,route}) {
     //#region Chức năng xem thêm thông tin
     // Lấy các trường chính để View 
     
-    let defaultKeys = ["RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", "UnitName", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", "Notes", "SalesManName","CreatedDate"];
+    let defaultKeys = ["RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", "Notes", "SalesManName","CreatedDate"];
     let defaultKeyRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
 
     let baocaodoanhthu =["VoucherDate","SalesManName","Quantity","ConvertAmount","ItemGroupID","WareHouseID"];
@@ -664,9 +664,7 @@ export default function Invoice({navigation,route}) {
                     setitemselect(item);
                     setVisibleKeys(defaultKeyRutgon)
                     keys=visibleKeys
-                    setTimeout(() => {
-                        setmodalPhieugiaohang(true);
-                    }, 600);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalPhieugiaohang,true);
                 }else{
                     console.log("data.data.ObjectData: ",data.data.ObjectData)
                 }
@@ -751,18 +749,18 @@ export default function Invoice({navigation,route}) {
                                 >
                                     <View style={{...containerView('report',data),margin:0}}>
                                         {/* Header */}
-                                        <View style={{...GridStyle('').headerRow}}>
+                                        <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
                                             {keys.map(key => (
-                                                <Text key={key} style={{...GridStyle(key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                                <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
                                             ))}
                                         </View>
 
                                         {/* Filter row */}
-                                        <View style={{...GridStyle('').filterRow}}>
+                                        <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
                                             {keys.map(key => (
                                             <TextInput                          
                                                 key={key}
-                                                style={{...GridStyle(key).filterInput}}
+                                                style={{...GridStyle(visibleKeys.length,key).filterInput}}
                                                 placeholder={''}
                                                 value={filters[key]}
                                                 onChangeText={value => fHandleFilterChange(key, value)}
@@ -794,11 +792,11 @@ export default function Invoice({navigation,route}) {
                                                 if (!show) return null;
                                         
                                                 return (
-                                                    <View style={{...GridStyle('').dataRow}}>
+                                                    <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                         {keys.map(key => (
                                                                 <Text 
                                                                     key={key} 
-                                                                    style={{...GridStyle(key).dataCell}}
+                                                                    style={{...GridStyle(visibleKeys.length,key).dataCell}}
                                                                     onPress={()=>{}}
                                                                 >
                                                                         {item[key]}
@@ -810,9 +808,9 @@ export default function Invoice({navigation,route}) {
                                             }}
                                             ListFooterComponent={() =>
                                                 filteredData.length > 0 ? (
-                                                <View style={{...GridStyle('').dataRow}}>
+                                                <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                     {keys.map(key => (
-                                                        <Text key={key} style={{...GridStyle(key).dataCell,fontWeight:'bold',color:'black'}}>
+                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
                                                             {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
                                                         </Text>
                                                     ))}
@@ -862,18 +860,18 @@ export default function Invoice({navigation,route}) {
                             >
                                 <View style={{...containerView('report',data)}}>
                                     {/* Header */}
-                                    <View style={{...GridStyle('').headerRow}}>
+                                    <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
                                         {keys.map(key => (
-                                            <Text key={key} style={{...GridStyle(key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                            <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
                                         ))}
                                     </View>
 
                                     {/* Filter row */}
-                                    <View style={{...GridStyle('').filterRow}}>
+                                    <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
                                         {keys.map(key => (
                                         <TextInput                          
                                             key={key}
-                                            style={{...GridStyle(key).filterInput}}
+                                            style={{...GridStyle(visibleKeys.length,key).filterInput}}
                                             placeholder={''}
                                             value={filters[key]}
                                             onChangeText={value => fHandleFilterChange(key, value)}
@@ -900,14 +898,14 @@ export default function Invoice({navigation,route}) {
                                             if (!show) return null;
                                     
                                             return (
-                                                <TouchableOpacity style={{...GridStyle('').dataRow}} 
+                                                <TouchableOpacity style={{...GridStyle(visibleKeys.length,'').dataRow}} 
                                                     onPress={()=>{
                                                         route.params.id=='phieugiaohang'?fDetailItem(item):null
                                                     }}>
                                                     {keys.map(key => (
                                                         <Text 
                                                             key={key} 
-                                                            style={{ ...GridStyle(key).dataCell}}
+                                                            style={{ ...GridStyle(visibleKeys.length,key).dataCell}}
                                                         >
                                                             {item[key]}
                                                         </Text> 
@@ -917,9 +915,9 @@ export default function Invoice({navigation,route}) {
                                         }}
                                         ListFooterComponent={() =>
                                                 filteredData.length > 0 ? (
-                                                <View style={{...GridStyle('').dataRow}}>
+                                                <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                     {keys.map(key => (
-                                                        <Text key={key} style={{...GridStyle(key).dataCell,fontWeight:'bold',color:'black'}}>
+                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
                                                             {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
                                                         </Text>
                                                     ))}

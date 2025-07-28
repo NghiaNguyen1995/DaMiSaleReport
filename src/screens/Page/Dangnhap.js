@@ -27,6 +27,7 @@ import { pick, types } from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import { getBaseURL } from '../../api/ApiManager';
 import { Modal } from 'react-native-paper';
+import { clsFunc } from '../Function/Chung/fSupport';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -279,7 +280,6 @@ export default function Login({ navigation }) {
                     user.ID = manv.toUpperCase();  
                     user.Password = pw;  
                     fSetStorageUserPass(user);
-                    //AsyncStorage.setItem('user', JSON.stringify(user));
                     navigation.navigate(NameScreen.TrangChu, user);
                 } else {
                     const defaultUser = {
@@ -289,20 +289,15 @@ export default function Login({ navigation }) {
                         'Password': pw
                     };
                     fSetStorageUserPass(defaultUser);
-                    //AsyncStorage.setItem('user', JSON.stringify(defaultUser));
                     navigation.navigate(NameScreen.TrangChu, defaultUser);
                 }
             }else{
                 if(data.status==401){
                     setloaithongbao('ErrorPassword');
-                    setTimeout(() => {
-                      setmodalthongbao(true);
-                    }, 600);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalthongbao,true);
                 }else if(data.status==500){
                     setloaithongbao('NoRegistAccount');
-                    setTimeout(() => {
-                      setmodalthongbao(true);
-                    }, 600);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalthongbao,true);  
                 }
  
             }
@@ -465,15 +460,11 @@ export default function Login({ navigation }) {
                 await ResetPassword(data).then((data)=>{
                   if(data.status==200){
                     setloaithongbao('UpdatePasswordSuccess');
-                    setTimeout(() => {
-                      setmViewDoiMatKhau(false);
-                      setmodalthongbao(true);
-                    }, 500);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmViewDoiMatKhau,false);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalthongbao,true);
                   }else{
                     setloaithongbao('UpdatePasswordFail');
-                    setTimeout(() => {            
-                      setmodalthongbao(true);
-                    }, 500);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalthongbao,true);
                   }
                 })
             }
