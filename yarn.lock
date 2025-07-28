@@ -7709,11 +7709,6 @@ react-native-gesture-handler@^2.27.1:
     hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
 
-react-native-gif@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-gif/-/react-native-gif-1.0.3.tgz#3d3e5347df3dc352e926c3dc9d83a2599c9e138c"
-  integrity sha512-UXeT8Gyff0ksCTiRYNZ3DqykevG1vZUQLi7oe9pB7yS4nSlMn11w22/nOcNCpHuZsaod86+xPi1MSxtNkFNJ5g==
-
 react-native-google-drive-api-wrapper@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/react-native-google-drive-api-wrapper/-/react-native-google-drive-api-wrapper-1.4.0.tgz#4d113fe4019a697e4f0b7eb36b68893a4c04d316"

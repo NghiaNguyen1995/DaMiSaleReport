@@ -40,10 +40,10 @@ export default function Login({ navigation }) {
     const [visibleLoadData,setvisibleLoadData]=useState(false)
 
     useEffect(() => {
-        RequestUserPermission()
-        CheckApplicationPermission()
+        //RequestUserPermission()
+        //CheckApplicationPermission()
         Getappcaption()
-        GetthongbaoFirebase()
+        //GetthongbaoFirebase()
     }, []);
    
     //Yêu cầu quyền thiết bị để lấy Token trong IOS
