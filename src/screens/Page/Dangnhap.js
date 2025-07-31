@@ -13,26 +13,24 @@ import {
 import firestore from "@react-native-firebase/firestore";
 import filter from 'lodash.filter';
 import messaging from '@react-native-firebase/messaging'
+import RNFS from 'react-native-fs';
 import { icons, COLORS, FONTS } from '../../../constants';
 import { Alert } from 'react-native';
 import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
 import { NameScreen } from '../../../constants/NameScreen';
 import { buttonStyle, containerInput, ModalNewStyle, ModalStyle } from '../../../constants/stylechung';
-
-import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder, createFolderDrive, createJsonFile, getContentFile, getSharedParentFolder } from '../../Function/GoogleDrive/GetListFileGGDrive';
+import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder } from '../../Function/GoogleDrive/GetListFileGGDrive';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GetLogin, ResetPassword } from '../../api/SalesManager';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { pick, types } from '@react-native-documents/picker';
-import RNFS from 'react-native-fs';
-import { getBaseURL } from '../../api/ApiManager';
 import { Modal } from 'react-native-paper';
 import { clsFunc } from '../Function/Chung/fSupport';
+import { clsSignalRService } from '../Function/Chung/fSignalRService';
+import { clsPushNotification } from '../Function/Chung/fPushNotificationLocal';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-
-const SIGN_IN = 'SIGN_IN'
 
 export default function Login({ navigation }) {
     const [Token, setToken] = useState('')
@@ -54,15 +52,18 @@ export default function Login({ navigation }) {
 
     useEffect(() => {
 
-        Platform.OS==='ios'?null:RequestUserPermission()
-        Platform.OS==='ios'?null:CheckApplicationPermission()
-        Platform.OS==='ios'?null: GetthongbaoFirebase()
-        
+        //Platform.OS==='ios'?null:RequestUserPermission()
+        //Platform.OS==='ios'?null:CheckApplicationPermission()
+        //Platform.OS==='ios'?null: GetthongbaoFirebase()
+
         Getappcaption()
 
         const t1 = setTimeout(() => setShowTitle(true), 100);
         const t2 = setTimeout(() => setShowBody(true), 200);
         const t3 = setTimeout(() => setShowFooter(true), 300);
+
+        clsPushNotification.configureNotification({navigation});   
+        clsSignalRService.startConnection();
 
         return () => {
           clearTimeout(t1);

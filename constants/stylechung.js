@@ -327,9 +327,10 @@ const Info =()=>{
 export const containerHeader={
     ctnHeader:Info(),
     headerCaption:{
-            fontSize:17,
-            color:"white",
-            textAlign:'center',
+        fontSize:17,
+        color:"white",
+        textAlign:'center',
+        fontWeight:'bold'
     }
 }
 
@@ -677,52 +678,53 @@ export const GridStyle = (totalColumn,key) => ({
         borderWidth: 1,
         borderColor: '#eee',
         textAlign: fSetTextAlignForText(key),
-        textAlignVertical:'center'
+        textAlignVertical:'center',
     }
 });
 
 export function fSetTextAlignForText(key){
     if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('VoucherNo')||key.includes('NoteDetails')){
         return 'left';
-    }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('VoucherDate')||key.includes('UnitName')){
+    }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('Date')||key.includes('UnitName')){
         return 'center';
     }
     else{
         return 'right';
     }
 }
-//115 + 50 + 115 = 280
-export function fSetWidthRowFlatListItem(totalColumn,key){
-    // Nếu totalColumn là 4, xử lý theo key chi tiết
-    if (totalColumn >= 4) {
-        if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) {
-        return 100; // tên hoặc ghi chú
-        } else if (key.includes('ID') || key.includes('RowNumber') || key.includes('UnitName')) {
-        return 60; // ID, STT, đơn vị
-        } else if (key.includes('Date') || key.includes('VoucherNo')) {
-        return 98; // ngày, số chứng từ
-        } else {
-        return 120; // các cột khác
-        }
-    }
 
-    // Nếu totalColumn là 1, 2 hoặc 3 thì chia đều theo độ rộng màn hình
-    if (totalColumn >= 1 && totalColumn <= 3) {
-        return Math.floor(windowWidth / totalColumn);
-    }
+export function fSetWidthRowFlatListItem(totalColumn, key) {
+    
+  // Tỷ lệ phần trăm cho từng loại cột (chỉ dùng khi >= 4 cột)
+  const ratio = {
+    large: 0.25,   // ~25% cho cột "tên" hoặc "ghi chú"
+    small: 0.13,   // ~13% cho ID, STT, đơn vị
+    medium: 0.25,  // ~25% cho ngày, số chứng từ
+    default: 0.30, // ~30% cho các cột dữ liệu số
+  };
 
-    return 100;
-    /*if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('NoteDetails')){
-        return 100//return 115;
-    }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('UnitName')){
-        return 60//return 50;
-    }else if(key.includes('Date')||key.includes('VoucherNo')){
-        return 98
+  if (totalColumn >= 4) {
+    if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) {
+      return Math.floor(windowWidth * ratio.large);
+    } else if ((key.includes('ID')&&!key.includes('ObjIDChanged'))|| key.includes('RowNumber') || key.includes('UnitName')) {
+      return Math.floor(windowWidth * ratio.small);
+    } else if (key.includes('Date') || key.includes('VoucherNo')|| key.includes("TypeChanged")||key.includes('ObjIDChanged')) {
+      return Math.floor(windowWidth * ratio.medium);
+    } else {
+      return Math.floor(windowWidth * ratio.default);
     }
-    else{
-        return 120//return 115;
-    }*/
+  }
+
+  // Nếu ít cột (1-3), chia đều
+  if (totalColumn >= 1 && totalColumn <= 3) {
+    return Math.floor((windowWidth * 0.97) / totalColumn);
+  }
+
+  // Mặc định
+  return Math.floor((windowWidth * 0.97) / 4);
 }
+
+
 //#endregion
 
 

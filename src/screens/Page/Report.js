@@ -61,7 +61,7 @@ export default function Report({navigation,route}) {
     //#region Chức năng xem thêm thông tin
     // Lấy các trường chính để View 
 
-    const defaultKeysKhoDayDu = ["ItemID", "ItemName", "UnitName", "WareHouseID", "BegInvQuantity", "BegInvQuantity2", "InQuantity", "InQuantity2", "OutQuantity", 'OutQuantity2', 'EndInvQuantity','EndInvQuantity2' ];
+    const defaultKeysKhoDayDu = [/*"ItemID", */"ItemName", "UnitName", "WareHouseID", "BegInvQuantity", "BegInvQuantity2", "InQuantity", "InQuantity2", "OutQuantity", 'OutQuantity2', 'EndInvQuantity','EndInvQuantity2' ];
     const defaultKeysKhoRutGon = ["ItemName", "WareHouseID", "EndInvQuantity", "EndInvQuantity2"];
 
     const defaultKeysCongnoDayDu = ["AccountID", "TradeName", "CnvBegDebit", "CnvBegCredit","CnvDebit","CnvCredit","CnvEndDebit","CnvEndCredit"]; 
@@ -810,7 +810,7 @@ export default function Report({navigation,route}) {
                                             filteredData.length > 0 ? (
                                                 <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                     {keys.map(key => (
-                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
+                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key,'').dataCell,fontWeight:'bold',color:'black'}}>
                                                             {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
                                                         </Text>
                                                     ))}

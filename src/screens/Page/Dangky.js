@@ -14,10 +14,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { icons, COLORS, FONTS } from '../../../constants';
 import {FunctionViewThongBao} from '../Function/Chung/functionViewThongBao';
 import { useRoute } from '@react-navigation/native';
-import { NameScreen } from '../../../constants/NameScreen';
 import { GetDevice } from '../Function/Chung/functionInfoDevice';
 import { buttonStyle } from '../../../constants/stylechung';
-
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const SIGN_IN = 'SIGN_IN'

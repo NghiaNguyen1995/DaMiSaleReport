@@ -109,10 +109,10 @@ export const TrangChu = ({navigation,route}) => {
             description: "BÁO CÁO\nCÔNG NỢ"
         },
         { 
-            id: 'phieugiaohang',
+            id: 'phieubanhang',
             icon: icons.report_delivery,
             //color: COLORS.yellow,
-            description: "PHIẾU\nGIAO HÀNG"
+            description: "PHIẾU\nBÁN HÀNG"
         },{ 
             id: 'doanhthubanhang',
             icon: icons.report_doanhthubanhang,
@@ -132,11 +132,11 @@ export const TrangChu = ({navigation,route}) => {
             case 'baocaocongno':
                 navigation.navigate(NameScreen.Tonghophanghoa,item)
                 break;
-            case 'phieugiaohang':
-                navigation.navigate(NameScreen.Phieugiaohang,item)
+            case 'phieubanhang':
+                navigation.navigate(NameScreen.Phieubanhang,item)
                 break;
             case 'doanhthubanhang':
-                navigation.navigate(NameScreen.Phieugiaohang,item)
+                navigation.navigate(NameScreen.Phieubanhang,item)
                 break;
             // ... thêm các case khác
             default:
@@ -177,7 +177,9 @@ export const TrangChu = ({navigation,route}) => {
                              alignSelf:'center'
                             
                         }}
-                        onPress={()=>{}}>
+                        onPress={()=>{
+                            navigation.navigate(NameScreen.Thongbao,{id:'thongbao',description:"THÔNG BÁO"})
+                        }}>
                             <Image
                                 source={icons.bell}
                                 style={{

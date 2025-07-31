@@ -16,7 +16,7 @@ export const NameScreen = {
     ChamCongGPS:'ChamCongGPS',
     NghiPhep:'NghiPhep',
     BangCong:'BangCong',
-    ThongBao:'ThongBao',
+    
     DuyetDeXuat:'DuyetDeXuat',
     TaiLieu:'TaiLieu',
     PhieuLuong:'PhieuLuong',
@@ -31,8 +31,7 @@ export const NameScreen = {
 
     //DaMi
     Tonghophanghoa:'Report',
-    Phieugiaohang:'Invoice',
-    Dangkyurl:'Setupurl'
-
-  
+    Phieubanhang:'Invoice',
+    Dangkyurl:'Setupurl',
+    Thongbao:'Thongbao',
 }

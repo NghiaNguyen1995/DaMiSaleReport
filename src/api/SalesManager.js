@@ -145,7 +145,6 @@ export const GetEmployeeList = async() => {
     }
 }
 
-
 // Login
 export const GetLogin = async(username,password,setload) => {
     try {

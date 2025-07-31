@@ -8,6 +8,7 @@ import UserScreen from '../screens/Page/Userpage';
 import Report from '../screens/Page/Report';
 import Invoice from '../screens/Page/Invoice';
 import SetupUrl from '../screens/Page/Setupurl';
+import NotificationListScreen from '../screens/Page/NotificationList';
 
 
 
@@ -22,11 +23,14 @@ const Routers = () => {
         <Stack.Screen name="DangKyTaiKhoan" component={Regist} />  
 
         <Stack.Screen name="TrangChu"  component={TrangChu}  />
+        <Stack.Screen name="Thongbao"  component={NotificationListScreen}  />
+    
         <Stack.Screen name="Report"  component={Report}  />
         <Stack.Screen name="Invoice"  component={Invoice}  />
 
         <Stack.Screen name="ThongTinTaiKhoan"  component={UserScreen}  />
         <Stack.Screen name="Setupurl"  component={SetupUrl}  />
+        
 
      </Stack.Navigator>
      </NavigationContainer>

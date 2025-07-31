@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Platform } from 'react-native';
+import { COLORS } from '../../../../constants';
 
 export class clsFunc {
 
@@ -9,7 +10,9 @@ export class clsFunc {
       return item[key] != 0 && item[key] != '' && item[key] != null ? clsFunc.fFormatNumberVN(item[key].toString()) : '';
     }else if (key.includes('Date')) {
       return item[key] != '' && item[key] != null ? moment(item[key],"DD/MM/YYYY").format("DD/MM/YYYY") : '';
-    } else {
+    }else if(key.includes('time')){
+      return item[key] != '' && item[key] != null ? moment(item[key]).format("DD/MM/YYYY HH:mm:SS") : '';
+    }else {
       return item[key];
     }
   }
@@ -115,6 +118,12 @@ export class clsFunc {
       SalesManName: "Tên NV",
       ItemGroupID: "Mã\nnhóm hàng",
       CreatedDate:"Ngày lập",
+      TypeChanged: "Kiểu\nthay đổi",
+      ObjIDChanged: "Đối tượng\nthay đổi",
+
+      title:'Tiêu đề\nthông báo',
+      message:'Nội dung\nthông báo',
+      time: 'Thời gian\nthông báo'
     };
     return mapping[key] || key;
   }
@@ -173,7 +182,7 @@ export class clsFunc {
           return !isNaN(val) ? sum + val : sum;
         }, 0);
       } else if (key.includes('ItemName') || key.includes('TradeName') || key.includes('VoucherNo')) {
-        if(loaiview === 'phieugiaohang'){
+        if(loaiview === 'phieubanhang'){
           totalRow['ItemName'] ='TỔNG CỘNG';
         }else{
           totalRow[key] = 'TỔNG CỘNG';
@@ -186,8 +195,9 @@ export class clsFunc {
     return totalRow;
   }
 
+  // Đặt tên value cho cột là Tổng cổng của dòng Total 
   static fNameTotalRow(key,item,id) {
-    if(id === 'phieugiaohang'){
+    if(id === 'phieubanhang'){
       if(key=="ItemName"){
         return item['ItemName']='TỔNG CỘNG';
       }else{
@@ -209,6 +219,7 @@ export class clsFunc {
     
   }  
 
+  // Chức năng cho Apple để xử lý bất đồng bộ (Load dữ liệu xong thì mới View Modal)
   static fSetTimeToOpenModalThongBao(setOpenModal,giatri){
     if(Platform.OS==='ios'){
       setTimeout(() => {
@@ -218,4 +229,66 @@ export class clsFunc {
       setOpenModal(giatri);
     }
   }
+
+  // Set màu cho Background View hoặc Color Item đối với các dữ liệu đặc biệt trong FlatList
+  static fSetColorForItemSpecial(TypeSet,key,item){
+      //Kiểm tra key có trong item đó không!
+      if (!item || !(key in item)) {
+        return null; 
+      }
+      if(TypeSet==='background'){
+        switch(item[key]){
+          case '1':
+            return '#F08080'
+          case '2':
+            return '#6495ED'
+          case '3':
+            return '#FF99FF'
+          case '4': 
+            return '#CD853F'
+          default:
+            return null
+        }
+      }else{
+         switch(item[key]){
+          case '1':
+            return 'white'
+          case '2':
+            return 'white'
+          case '3':
+            return 'white'
+          case '4': 
+            return 'white'
+          default:
+            return null
+        }
+      }
+     
+      //Sau đó mới xét đến điều kiện để gán màu phù hợp cho background View hoặc color Item!
+      /*if(item[key]!==ComparativeValue){
+          if(TypeSet==='background'){
+              return COLORS.red
+          }else{
+              return 'white'
+          }
+      }else{
+        return null
+      }*/
+  }
+
+  static fRenameObjIDChanged(key){
+    switch(key){
+      case '1':
+        return 'Số lượng vật tư thay đổi'
+      case '2':
+        return 'Đơn giá vật tư thay đổi'
+      case '3':
+        return 'Sửa giá bán vật tư trong danh mục'
+      case '4':
+        return 'Giá bán khác với giá trong danh mục'
+      default: 
+        return ''
+    }
+  }
+
 }

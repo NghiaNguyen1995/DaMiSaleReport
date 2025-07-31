@@ -51,7 +51,7 @@ export default function Invoice({navigation,route}) {
     const [filteredData, setFilteredData] = useState([]);
     const [filters, setFilters] = useState({});
 
-    const [modalPhieugiaohang,setmodalPhieugiaohang]=useState(false)
+    const [modalphieubanhang,setmodalphieubanhang]=useState(false)
 
     const [datadetail, setdatadetail] = useState([]);
     const [itemselect,setitemselect]=useState({});
@@ -60,20 +60,24 @@ export default function Invoice({navigation,route}) {
     const[visibleLoadData,setvisibleLoadData]=useState(false)
     
     const [totalRow, setTotalRow] = useState({});
+    const [totalRowDetail, settotalRowDetail] = useState({});
 
     //#region Chức năng xem thêm thông tin
     // Lấy các trường chính để View 
     
-    let defaultKeys = ["RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", "Notes", "SalesManName","CreatedDate"];
-    let defaultKeyRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
+    let phieubanhang = [
+        "RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", 
+        "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", 
+        "SalesManName", "CreatedDate", "ObjIDChanged", "Notes"
+    ];
+    let phieubanhangRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
 
     let baocaodoanhthu =["VoucherDate","SalesManName","Quantity","ConvertAmount","ItemGroupID","WareHouseID"];
 
-    const [visibleKeys, setVisibleKeys] = useState(route.params.id=='phieugiaohang'?defaultKeys:baocaodoanhthu);
+    const [visibleKeys, setVisibleKeys] = useState(route.params.id=='phieubanhang'?phieubanhang:baocaodoanhthu);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
 
-    //let allKeys = data[0]?Object.keys(data[0]):selectedKeys;
     let allKeys = Object.keys(data[0] || {});
 
     // Mở modal thì set selectedKeys hiện tại
@@ -207,7 +211,7 @@ export default function Invoice({navigation,route}) {
         )
     }
 
-    const ComponentInputPhieuGiaoHang = () => {
+    const ComponentInputphieubanhang = () => {
         
         const [localvVoucher, setlocalvVoucher] = useState(vVoucher);
         const [localvCustumer, setlocalvCustumer] = useState(vCustumer);
@@ -473,7 +477,7 @@ export default function Invoice({navigation,route}) {
                                 <TouchableOpacity
                                     onPress={() => {
                                         const today = new Date();
-                                        if (titleHeaderComponent.id === 'phieugiaohang') setdVoucher(today);
+                                        if (titleHeaderComponent.id === 'phieubanhang') setdVoucher(today);
                                         if (titleHeaderComponent.id === 'nhanvienbanhang') setstartDay(today);
                                         setcalendarSelectedDate(today);
                                         setopenViewCalendar(false);
@@ -525,7 +529,7 @@ export default function Invoice({navigation,route}) {
 
     "Function xử lý khi chọn ngày trên ViewCalendar xong"
     function fOnDateChange(date){
-        if(titleHeaderComponent.id==='phieugiaohang'){
+        if(titleHeaderComponent.id==='phieubanhang'){
             setdVoucher(date);
         }else{
             if(loaibamngay=='s'){
@@ -578,7 +582,7 @@ export default function Invoice({navigation,route}) {
     function fNapdulieu(voucher,custumer){
         setvVoucher(voucher);
         setvCustumer(custumer);
-        titleHeaderComponent.id==='phieugiaohang'?fGetSalesVoucher(voucher,custumer):fGetGeneralSalesByDate();
+        titleHeaderComponent.id==='phieubanhang'?fGetSalesVoucher(voucher,custumer):fGetGeneralSalesByDate();
     }
 
     "Hàm lấy dữ liệu Phiếu giao hàng"
@@ -591,10 +595,18 @@ export default function Invoice({navigation,route}) {
         
         await GetSalesVoucher(dayVoucher,voucher,custumer,vS,setvisibleLoadData).then((data)=>{
             if(data.status==200){
-                console.log("Get dữ liệu hóa đơn",data.data.ObjectData);
-                if(data.data.ObjectData.length > 0) {
-                    setData(data.data.ObjectData);
-                    setFilteredData(data.data.ObjectData);
+                let dt = data.data.ObjectData
+                console.log("Get dữ liệu hóa đơn",dt);
+                
+                if(dt.length > 0) {
+                    /*let newData = dt.map((item, index) => ({
+                        ...item,
+                        TypeChanged: (index % 7), // Giá trị từ 1 đến 4, lặp lại
+                        ObjIDChanged: clsFunc.fRenameObjIDChanged((index % 7)),
+                    }));
+                    console.log('dt sau khi đổi: ',newData)*/
+                    setData(dt);
+                    setFilteredData(dt);
                     setTotalRow(data.data.SummaryData);                   
                 }else{
                     setData([]);
@@ -636,7 +648,7 @@ export default function Invoice({navigation,route}) {
         }
     }
 
-    "Hàm nạp dữ liệu ch List data detail khi người dùng chọn dòng item"
+    "Hàm nạp dữ liệu ch List data detail GetSaleVoucher khi người dùng chọn dòng item"
     async function fDetailItem(item){
         
         let vDate = moment(item.VoucherDate,"DD/MM/YYYY").format("YYYY-MM-DD");
@@ -644,7 +656,7 @@ export default function Invoice({navigation,route}) {
         let TradeName = item.TradeName != null && item.TradeName !=''?item.TradeName : '';
         let SalesManID = '';
         if (iStaff && Array.isArray(iStaff)) {
-            const foundStaff = iStaff.find(staff => staff.label === item.PrepairedByName);
+            const foundStaff = iStaff.find(staff => staff.label === item.SalesManName);
             console.log('foundStaff:', foundStaff);
             if (foundStaff && 'value' in foundStaff) {
                 SalesManID = foundStaff.value;
@@ -660,11 +672,11 @@ export default function Invoice({navigation,route}) {
             if(data.status==200){
                 if(data.data.ObjectData.length > 0) {
                     setdatadetail(data.data.ObjectData);
-                    setTotalRow(data.data.SummaryData);
+                    settotalRowDetail(data.data.SummaryData);
                     setitemselect(item);
-                    setVisibleKeys(defaultKeyRutgon)
+                    setVisibleKeys(phieubanhangRutgon)
                     keys=visibleKeys
-                    clsFunc.fSetTimeToOpenModalThongBao(setmodalPhieugiaohang,true);
+                    clsFunc.fSetTimeToOpenModalThongBao(setmodalphieubanhang,true);
                 }else{
                     console.log("data.data.ObjectData: ",data.data.ObjectData)
                 }
@@ -729,14 +741,14 @@ export default function Invoice({navigation,route}) {
     //#endregion
 
     //#region Modal Item phiếu thanh toán
-    const ModalPhieuGiaoHang = ({ modalPhieugiaohang, setmodalPhieugiaohang, datadetail, itemselect }) => {
+    const Modalphieubanhang = ({ modalphieubanhang, setmodalphieubanhang, datadetail, itemselect }) => {
 
         return (
-            <Modal visible={modalPhieugiaohang} animationType="slide" transparent={true}>
+            <Modal visible={modalphieubanhang} animationType="slide" transparent={true}>
                 <View style={{...ModalNewStyle.modalOverlay}}>
                     <View style={{...ModalNewStyle.modalContainer}}>
-                        <Text style={style.title}>PHIẾU GIAO HÀNG</Text>
-                        <Text style={style.subTitle}>NV: {itemselect.PrepairedByName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
+                        <Text style={style.title}>PHIẾU BÁN HÀNG</Text>
+                        <Text style={style.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
                         <Text style={style.customer}>Khách hàng: {itemselect.TradeName}</Text>
         
                         <View style={{ height:'60%'}}>
@@ -811,7 +823,7 @@ export default function Invoice({navigation,route}) {
                                                 <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                     {keys.map(key => (
                                                         <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
-                                                            {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
+                                                            {clsFunc.fNameTotalRow(key,totalRowDetail,titleHeaderComponent.id)}
                                                         </Text>
                                                     ))}
                                                 </View>
@@ -823,11 +835,11 @@ export default function Invoice({navigation,route}) {
                                 </ScrollView>
                         </View>
         
-                        <Text style={style.total}>Tổng thành tiền: {totalRow.ConvertAmount}</Text>
+                        <Text style={style.total}>Tổng thành tiền: {totalRowDetail.ConvertAmount}</Text>
                        
                         <TouchableOpacity onPress={()=>{
-                            setVisibleKeys(defaultKeys)
-                            setmodalPhieugiaohang(false);    
+                            setVisibleKeys(phieubanhang)
+                            setmodalphieubanhang(false);    
                         }} style={style.closeButton}>
                             <Text style={style.closeText}>Đóng</Text>
                         </TouchableOpacity>
@@ -837,7 +849,7 @@ export default function Invoice({navigation,route}) {
         );
     };
     //#endregion
-    
+
     return (
         <TouchableWithoutFeedback onPress={()=>{ Keyboard.dismiss() }} accessible={false}>
             <KeyboardAvoidingView 
@@ -849,8 +861,8 @@ export default function Invoice({navigation,route}) {
                     
                     <ComponentHeader />
                     
-                    {titleHeaderComponent.id==='phieugiaohang'?
-                        <ComponentInputPhieuGiaoHang />:<ComponentInputquanlydoanhthu />
+                    {titleHeaderComponent.id==='phieubanhang'?
+                        <ComponentInputphieubanhang />:<ComponentInputquanlydoanhthu />
                     }
 
                     <View style={{ flex: filteredData.length>0?1:null}}>
@@ -862,7 +874,7 @@ export default function Invoice({navigation,route}) {
                                     {/* Header */}
                                     <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
                                         {keys.map(key => (
-                                            <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                            <Text key={key} style={{...GridStyle(visibleKeys.length,key,'').headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
                                         ))}
                                     </View>
 
@@ -890,6 +902,9 @@ export default function Invoice({navigation,route}) {
                                             </View>
                                         )} 
                                         renderItem={({ item }) => {   
+
+                                            const isNoteNull = item?.Notes !== null ;
+
                                             if (!item) return null;                    
                                             const show = !!item && Object.keys(filters).every(k =>
                                                 (item?.[k] ?? '').toString().toLowerCase().includes((filters[k] ?? '').toLowerCase())
@@ -898,14 +913,20 @@ export default function Invoice({navigation,route}) {
                                             if (!show) return null;
                                     
                                             return (
-                                                <TouchableOpacity style={{...GridStyle(visibleKeys.length,'').dataRow}} 
+                                                <TouchableOpacity style={{
+                                                    ...GridStyle(visibleKeys.length,'').dataRow,
+                                                    backgroundColor: clsFunc.fSetColorForItemSpecial('background',"TypeChanged",item)
+                                                }} 
                                                     onPress={()=>{
-                                                        route.params.id=='phieugiaohang'?fDetailItem(item):null
+                                                        route.params.id=='phieubanhang'?fDetailItem(item):null
                                                     }}>
                                                     {keys.map(key => (
                                                         <Text 
                                                             key={key} 
-                                                            style={{ ...GridStyle(visibleKeys.length,key).dataCell}}
+                                                            style={{
+                                                                ...GridStyle(visibleKeys.length,key).dataCell,
+                                                                color: clsFunc.fSetColorForItemSpecial('color',"TypeChanged",item)
+                                                            }}
                                                         >
                                                             {item[key]}
                                                         </Text> 
@@ -915,7 +936,7 @@ export default function Invoice({navigation,route}) {
                                         }}
                                         ListFooterComponent={() =>
                                                 filteredData.length > 0 ? (
-                                                <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
+                                                <View style={{...GridStyle(visibleKeys.length,'','').dataRow}}>
                                                     {keys.map(key => (
                                                         <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
                                                             {clsFunc.fNameTotalRow(key,totalRow,titleHeaderComponent.id)}
@@ -941,10 +962,10 @@ export default function Invoice({navigation,route}) {
                     :null}
 
 
-                    {modalPhieugiaohang?
-                        <ModalPhieuGiaoHang 
-                            modalPhieugiaohang={modalPhieugiaohang} 
-                            setmodalPhieugiaohang={setmodalPhieugiaohang} 
+                    {modalphieubanhang?
+                        <Modalphieubanhang 
+                            modalphieubanhang={modalphieubanhang} 
+                            setmodalphieubanhang={setmodalphieubanhang} 
                             datadetail={datadetail}
                             itemselect={itemselect}
                         />:null

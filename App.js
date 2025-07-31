@@ -1,14 +1,16 @@
 import React,{useEffect} from 'react';
 import Routers from './src/routers';
 import messaging from '@react-native-firebase/messaging';
-import { Alert, Platform  } from 'react-native';
+import { Alert, Platform,PermissionsAndroid  } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 const App =()=>{
   
-  useEffect(()=>{
-      Platform.OS==='ios'?null:notifymessBackground();
-  })
-
+  /*useEffect(()=>{
+    
+  //})
+  
+  // Giành cho Firebase FCM Message: Phải đăng ký json App cho ios.
   const notifymessBackground=()=>{
     messaging().setBackgroundMessageHandler(remoteMessage=>{
       if(remoteMessage){
@@ -17,13 +19,14 @@ const App =()=>{
           Alert.alert(`${title}`,`${body}`)
       }
     });
-  }
-  
+  }*/
+
   return (
-      <SafeAreaProvider>   
-          <Routers />     
-      </SafeAreaProvider>
+    <SafeAreaProvider>   
+        <Routers />     
+    </SafeAreaProvider>
   );
 }
 
 export default App;
+
