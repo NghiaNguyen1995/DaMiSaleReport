@@ -118,8 +118,8 @@ export class clsFunc {
       SalesManName: "Tên NV",
       ItemGroupID: "Mã\nnhóm hàng",
       CreatedDate:"Ngày lập",
-      TypeChanged: "Kiểu\nthay đổi",
-      ObjIDChanged: "Đối tượng\nthay đổi",
+      ModifiedType: "Kiểu\nthay đổi",
+      ModifiedObjID: "Đối tượng\nthay đổi",
 
       title:'Tiêu đề\nthông báo',
       message:'Nội dung\nthông báo',
@@ -264,16 +264,6 @@ export class clsFunc {
         }
       }
      
-      //Sau đó mới xét đến điều kiện để gán màu phù hợp cho background View hoặc color Item!
-      /*if(item[key]!==ComparativeValue){
-          if(TypeSet==='background'){
-              return COLORS.red
-          }else{
-              return 'white'
-          }
-      }else{
-        return null
-      }*/
   }
 
   static fRenameObjIDChanged(key){

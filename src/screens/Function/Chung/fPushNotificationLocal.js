@@ -14,8 +14,8 @@ export class clsPushNotification{
                 console.log("Người dùng có nhấn vô thông báo")
                 // Dùng navigationRef để điều hướng
                 let data={
-                id: 'thongbao',
-                description: "THÔNG BÁO"
+                  id: 'thongbao',
+                  description: "THÔNG BÁO"
                 }
 
                 navigation.navigate(NameScreen.Thongbao,data);

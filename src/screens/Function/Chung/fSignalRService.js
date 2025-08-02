@@ -26,12 +26,14 @@ export class clsSignalRService {
         let datamessage = JSON.parse(await AsyncStorage.getItem('notification')) || [];
 
         this.connection.on('ReceiveNotification', (message) => {
-            clsPushNotification.showLocalNotification('Thông báo mới', message);
+
+            clsPushNotification.showLocalNotification('Thông báo mới', message); //Thông báo khi trạng thái app online
+            
             datamessage.push({
                 title: 'Thông báo mới',
                 message: "Nội dung: "+message.modifiedBy+" vào lúc "+message.time,
-                time: new Date().toISOString()  // optional
-            });
+                time: new Date().toISOString() 
+            }); // Tạo danh sách thông báo và lưu vào Storage Local thiết bị
 
             // Lưu lại vào AsyncStorage
             AsyncStorage.setItem('notification', JSON.stringify(datamessage));

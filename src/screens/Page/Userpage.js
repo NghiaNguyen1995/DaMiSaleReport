@@ -35,16 +35,6 @@ export default function UserScreen({navigation,route}) {
       navigation.navigate(NameScreen.Login)
     }
 
-    const LoadingAnimation=()=>{
-              return (
-                <View style={styles.indicatorWrapper}>
-                      <ActivityIndicator size="large" style={styles.indicator} />
-                      <Text style={styles.indicatorText}>Loading ...
-                      </Text>   
-                </View>
-              );
-    }
-
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setDuLieu()

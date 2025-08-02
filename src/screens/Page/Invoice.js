@@ -68,7 +68,7 @@ export default function Invoice({navigation,route}) {
     let phieubanhang = [
         "RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", 
         "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", 
-        "SalesManName", "CreatedDate", "ObjIDChanged", "Notes"
+        "SalesManName", "CreatedDate", "ModifiedObjID", "Notes"
     ];
     let phieubanhangRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
 
@@ -605,8 +605,15 @@ export default function Invoice({navigation,route}) {
                         ObjIDChanged: clsFunc.fRenameObjIDChanged((index % 7)),
                     }));
                     console.log('dt sau khi đổi: ',newData)*/
-                    setData(dt);
-                    setFilteredData(dt);
+
+                    let newData = dt.map((item) => {
+                        return {
+                            ...item,
+                            ModifiedObjID: clsFunc.fRenameObjIDChanged(item.ModifiedObjID)
+                        };
+                    });
+                    setData(newData);
+                    setFilteredData(newData);
                     setTotalRow(data.data.SummaryData);                   
                 }else{
                     setData([]);
@@ -915,7 +922,7 @@ export default function Invoice({navigation,route}) {
                                             return (
                                                 <TouchableOpacity style={{
                                                     ...GridStyle(visibleKeys.length,'').dataRow,
-                                                    backgroundColor: clsFunc.fSetColorForItemSpecial('background',"TypeChanged",item)
+                                                    backgroundColor: clsFunc.fSetColorForItemSpecial('background',"ModifiedType",item)
                                                 }} 
                                                     onPress={()=>{
                                                         route.params.id=='phieubanhang'?fDetailItem(item):null
@@ -925,7 +932,7 @@ export default function Invoice({navigation,route}) {
                                                             key={key} 
                                                             style={{
                                                                 ...GridStyle(visibleKeys.length,key).dataCell,
-                                                                color: clsFunc.fSetColorForItemSpecial('color',"TypeChanged",item)
+                                                                color: clsFunc.fSetColorForItemSpecial('color',"ModifiedType",item)
                                                             }}
                                                         >
                                                             {item[key]}

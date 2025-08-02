@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, icons } from '../../../constants';
 import { clsFunc } from '../Function/Chung/fSupport';
 
-const NotificationListScreen = ({navigation,route}) => {
+export const Notification = ({navigation,route}) => {
 
 
   const [titleHeaderComponent,settitleHeaderComponent] = useState([])
@@ -48,19 +48,38 @@ const NotificationListScreen = ({navigation,route}) => {
     setFilters(initialFilters);
   }
   //#endregion
-  
-  async function fLoadNotifications(){
+ 
+  //#region Get danh sách thông báo từ bộ nhớ cục bộ
+  async function fLoadNotifications() {
     try {
       const storedData = await AsyncStorage.getItem('notification');
       const parsedData = storedData ? JSON.parse(storedData) : [];
+
       if (Array.isArray(parsedData)) {
-        setData(parsedData.reverse()); // hiển thị mới nhất trước
-        setFilteredData(parsedData.reverse())
+        const currentDate = new Date();
+
+        // Lọc ra những item trong vòng 7 ngày gần nhất
+        const dt = parsedData.filter(item => {
+          const itemDate = new Date(item.time);
+          const diffTime = currentDate - itemDate; 
+          const diffDays = diffTime / (1000 * 60 * 60 * 24); 
+
+          return diffDays <= 7;
+        });
+
+        // Ghi lại vào AsyncStorage chỉ các item còn lại
+        await AsyncStorage.setItem('notification', JSON.stringify(dt));
+
+        // Hiển thị
+        setData(dt.reverse()); // Hiển thị mới nhất trước
+        setFilteredData(dt.reverse());
       }
+
     } catch (error) {
       console.error('Lỗi khi đọc notification từ AsyncStorage', error);
     }
   };
+  //#endregion
 
   //#region "Function Filter Data"
     "Filter theo từng cột của FlatList"
@@ -69,6 +88,7 @@ const NotificationListScreen = ({navigation,route}) => {
         setFilters(newFilters);
 
         const isAllEmpty = Object.values(newFilters).every(v => !v?.trim());
+        
         if (isAllEmpty) {
             setFilteredData(data); // Trả toàn bộ dữ liệu nếu không có filter nào
             return;
@@ -85,8 +105,9 @@ const NotificationListScreen = ({navigation,route}) => {
         setFilteredData(newData);
     }
 
+    
 
-    //#endregion
+  //#endregion
 
   const ComponentHeader=()=>{   
       return( 
@@ -107,8 +128,7 @@ const NotificationListScreen = ({navigation,route}) => {
 
               <Text style={{...containerHeader.headerCaption,width:'30%'}}>{titleHeaderComponent.description}</Text>
                   
-              <View style={{width:'30%'}}>
-                <Text>    </Text>                        
+              <View style={{width:'30%'}}>                 
               </View>
           </View>
       )
@@ -188,4 +208,4 @@ const NotificationListScreen = ({navigation,route}) => {
   );
 };
 
-export default NotificationListScreen;
+export default Notification;
