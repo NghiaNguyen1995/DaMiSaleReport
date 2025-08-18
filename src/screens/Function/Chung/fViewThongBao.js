@@ -15,7 +15,7 @@ export const FunctionViewThongBao = (loaithongbao,modalthongbao,setmodalthongbao
               <View style={ModalStyle.Modal}>
                 
                 {/* Title Thông báo */}
-                <View style={{backgroundColor: COLORS.skin2.bgheader,padding:10}}>
+                <View style={{backgroundColor: COLORS.skin2.bgheader,borderTopLeftRadius:12,borderTopRightRadius:12,paddingTop:10,paddingBottom:10,marginLeft:-9,marginRight:-9,marginTop:-9}}>
                       <Text style={{...object.labelTitle,textAlign:'center',fontWeight:'bold'}}>Thông báo</Text>
                 </View>
 
@@ -43,10 +43,8 @@ export const FunctionViewThongBao = (loaithongbao,modalthongbao,setmodalthongbao
                   {loaithongbao == 'ErrorOpenExcel' ?(<Text style={{...style3.text2,width:windowWidth*0.85,textAlign:'center'}}>
                   {'File đã được lưu nhưng thiết bị không có ứng dụng để mở file .xlsx.\n'+'Vui lòng cài đặt ứng dụng như Excel, WPS Office hoặc Google Sheets.'}</Text>):null}
                   {loaithongbao == 'ErrorExportExcel' ?(<Text style={{...style3.text2,width:windowWidth*0.85,textAlign:'center'}}>Lỗi xuất Excel</Text>):null}
+                  {loaithongbao == 'NoDetail' ?(<Text style={{...style3.text2,width:windowWidth*0.85,textAlign:'center'}}>Không có dữ liệu để xem thêm</Text>):null}
                   
-
-
-
 
                   {/*Đăng ký*/}
                   {loaithongbao == 'COPYTOCLIPBOARD' ?(<Text style={{...style3.text2,width:windowWidth*0.85,textAlign:'center'}}>Đã sao chép mã đăng ký{'\n'}Người dùng gửi nội dung này cho{'\n'}người quản trị</Text>):null}
@@ -247,7 +245,7 @@ const style3 = StyleSheet.create({
   },
   text2:{
     //marginLeft: 15,
-    fontSize: 18,
+    fontSize: 16,
     width: windowWidth * 0.5,
     color:'black'
   },

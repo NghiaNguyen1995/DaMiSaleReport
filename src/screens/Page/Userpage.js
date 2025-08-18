@@ -5,7 +5,7 @@ import {Avatar,Drawer} from 'react-native-paper'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect } from 'react'
 import { icons } from "../../../constants"
-import {FunctionViewThongBao} from '../Function/Chung/functionViewThongBao';
+import {FunctionViewThongBao} from '../Function/Chung/fViewThongBao';
 import { NameScreen } from '../../../constants/NameScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { pick, types } from '@react-native-documents/picker';

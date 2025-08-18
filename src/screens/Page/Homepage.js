@@ -9,7 +9,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { containerHeader,containerInput,card, footerthongke, ModalStyle} from '../../../constants/stylechung';
 import { NameScreen } from "../../../constants/NameScreen";
 import { object } from "../../../constants/theme";
-import { FunctionViewThongBao } from "../Function/Chung/functionViewThongBao";
+import { FunctionViewThongBao } from "../Function/Chung/fViewThongBao";
 import { SetNgayGio } from "../Function/Chung/functionGetDate";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -118,6 +118,11 @@ export const TrangChu = ({navigation,route}) => {
             icon: icons.report_doanhthubanhang,
             //color: COLORS.blue,
             description: "DOANH THU\nBÁN HÀNG"
+        },{ 
+            id: 'doanhthulaigop',
+            icon: icons.report_doanhthulaigop,
+            //color: COLORS.blue,
+            description: "DOANH THU\nLÃI GỘP"
         }
     ]
 
@@ -136,6 +141,9 @@ export const TrangChu = ({navigation,route}) => {
                 navigation.navigate(NameScreen.Phieubanhang,item)
                 break;
             case 'doanhthubanhang':
+                navigation.navigate(NameScreen.Phieubanhang,item)
+                break;
+            case 'doanhthulaigop':
                 navigation.navigate(NameScreen.Phieubanhang,item)
                 break;
             // ... thêm các case khác

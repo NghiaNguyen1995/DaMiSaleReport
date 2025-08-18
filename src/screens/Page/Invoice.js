@@ -9,11 +9,11 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Import từ các file khác
-import { containerHeader, containerInput, containerView, GridStyle, ModalNewStyle} from '../../../constants/stylechung'
+import { containerHeader, containerInput, containerView, GridStyle, ModalLich, ModalPhieugiaohang} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
-import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
+import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetEmployeeList, GetGeneralSalesByDate, GetSalesVoucher } from '../../api/SalesManager';
+import { GetEmployeeList, GetSalesVoucher, GetSalesRevenueByProc, GetGeneralSalesByDate } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
@@ -23,6 +23,9 @@ import { clsFunc } from '../Function/Chung/fSupport';
 
 export default function Invoice({navigation,route}) {
     
+    //let sNameProducer = clsFunc.fGetNameProceducer(route.params.id)
+    //console.log('sNameProducer: ',sNameProducer)
+
     const [titleHeaderComponent,settitleHeaderComponent] = useState([])
 
     // Dữ liệu cho ngày voucher khi chọn voucher
@@ -41,7 +44,6 @@ export default function Invoice({navigation,route}) {
     const [vStaff, setvStaff] = useState(null);
     const [iStaff, setiStaff] = useState([]);
     
-
     // Set loại thông báo hiển thị
     const [modalthongbao,setmodalthongbao] = useState(false)
     const [loaithongbao,setloaithongbao] = useState('')
@@ -70,11 +72,27 @@ export default function Invoice({navigation,route}) {
         "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", 
         "SalesManName", "CreatedDate", "ModifiedObjID", "Notes"
     ];
+
     let phieubanhangRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
 
     let baocaodoanhthu =["VoucherDate","SalesManName","Quantity","ConvertAmount","ItemGroupID","WareHouseID"];
 
-    const [visibleKeys, setVisibleKeys] = useState(route.params.id=='phieubanhang'?phieubanhang:baocaodoanhthu);
+    let baocaolaigop = ["ItemID","ItemName","Quantity","UnitName","CnvAmount511","CnvAmount632","CnvGrossProfit"];
+
+    function fKeyColumnVisible(){
+        switch (route.params.id) {
+            case 'phieubanhang':
+                return phieubanhang;
+            case 'doanhthubanhang':
+                return baocaodoanhthu;
+            case 'doanhthulaigop':
+                return baocaolaigop
+            default:
+                return null; 
+        }
+    }
+
+    const [visibleKeys, setVisibleKeys] = useState(fKeyColumnVisible());
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
 
@@ -111,7 +129,7 @@ export default function Invoice({navigation,route}) {
                     <TouchableWithoutFeedback onPress={()=>{setModalVisible(false)}}>
                         <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
                             <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
-                            <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM THÊM</Text>
+                            <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM</Text>
         
                             <ScrollView style={{maxHeight: 300}}>
                                 {allKeys.map(key => (
@@ -233,6 +251,7 @@ export default function Invoice({navigation,route}) {
                                 style={containerInput.textInput}
                                 value={localvVoucher}
                                 placeholder={'Nhập số phiếu'}
+                                placeholderTextColor={COLORS.black}
                                 onChangeText={(text) => setlocalvVoucher(text)}
                             />
                             {/*<Icon 
@@ -247,6 +266,7 @@ export default function Invoice({navigation,route}) {
                                 style={containerInput.textInput}
                                 value={localvCustumer}
                                 placeholder={'Nhập tên khách hàng'}
+                                placeholderTextColor={COLORS.black}
                                 onChangeText={(text) => setlocalvCustumer(text)}
                             />
                         </View>
@@ -312,6 +332,14 @@ export default function Invoice({navigation,route}) {
         
         const [oStaff, setoStaff] = useState(null);
 
+        function fCheckTypeView(){
+            if(titleHeaderComponent.id ==='doanhthubanhang'){
+                return true
+            }else{
+                return false
+            }
+        }
+
         return (
             <View style={{...containerInput.ctnInput, paddingTop:5}}>
                 
@@ -359,11 +387,11 @@ export default function Invoice({navigation,route}) {
                         />
                 </View>
 
-                {/* Gồm 3 nút: Lịch, nhân viên, nạp dữ liệu */}
-                <View style={{flexDirection:'row',alignItems:'center', gap: 20}}>
+                {/* Gồm 2 nút: nhân viên, nạp dữ liệu */}
+                <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center', gap: 20}}>
                     
-                        <View style={{width:'50%'}}>
-                            <TouchableWithoutFeedback onPress={()=>setoStaff(false)} style={{zIndex:5000}}>
+                    {fCheckTypeView()==true?<View style={{width:'50%'}}>
+                        <TouchableWithoutFeedback onPress={()=>setoStaff(false)} style={{zIndex:5000}}>
                             <ViewDroppoxStaff 
                                     vStaff={vStaff}
                                     setvStaff={setvStaff}
@@ -372,8 +400,8 @@ export default function Invoice({navigation,route}) {
                                     oStaff={oStaff}
                                     setoStaff={setoStaff}
                             />
-                            </TouchableWithoutFeedback>
-                        </View>   
+                        </TouchableWithoutFeedback>
+                    </View>:null} 
                     
                     <TouchableOpacity 
                         onPress={() => {
@@ -458,10 +486,10 @@ export default function Invoice({navigation,route}) {
         return(
             <Modal visible={openViewCalendar} animationType="fade" transparent={true}>
                 <TouchableWithoutFeedback onPress={() => setopenViewCalendar(false)}>
-                    <View style={style.overlay}>
-                        <View style={style.modalContainer}>
+                    <View style={ModalLich.overlay}>
+                        <View style={ModalLich.modalContainer}>
                             {/* Header */}
-                            <View style={style.modalHeader}>
+                            <View style={ModalLich.modalHeader}>
                                 <TouchableOpacity
                                     onPress={() => {
                                         setopenViewCalendar(false);
@@ -472,19 +500,25 @@ export default function Invoice({navigation,route}) {
                                     <Icon name="window-close" size={22} color="white" />
                                 </TouchableOpacity>
 
-                                <Text style={style.headerTitle}>CHỌN NGÀY</Text>
+                                <Text style={ModalLich.headerTitle}>CHỌN NGÀY</Text>
 
                                 <TouchableOpacity
                                     onPress={() => {
                                         const today = new Date();
                                         if (titleHeaderComponent.id === 'phieubanhang') setdVoucher(today);
-                                        if (titleHeaderComponent.id === 'nhanvienbanhang') setstartDay(today);
+                                        if (titleHeaderComponent.id === 'doanhthubanhang'){
+                                            if(loaibamngay=='s'){ 
+                                                setstartDay(today);
+                                            }else{
+                                                settoDay(today);
+                                            }
+                                        }
                                         setcalendarSelectedDate(today);
                                         setopenViewCalendar(false);
                                     }}
                                     style={{ flexDirection: 'row' }}
                                     >
-                                    <Text style={style.todayText}>Hôm{'\n'}nay</Text>
+                                    <Text style={ModalLich.todayText}>Hôm{'\n'}nay</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -533,7 +567,7 @@ export default function Invoice({navigation,route}) {
             setdVoucher(date);
         }else{
             if(loaibamngay=='s'){
-            setstartDay(date)
+                setstartDay(date)
             }else{
                 settoDay(date)
             }
@@ -580,9 +614,20 @@ export default function Invoice({navigation,route}) {
 
     "Hàm nạp dữ liệu khi người dùng nhấn nút"
     function fNapdulieu(voucher,custumer){
+
         setvVoucher(voucher);
         setvCustumer(custumer);
-        titleHeaderComponent.id==='phieubanhang'?fGetSalesVoucher(voucher,custumer):fGetGeneralSalesByDate();
+
+        switch (titleHeaderComponent.id) {
+            case 'phieubanhang':
+                return fGetSalesVoucher(voucher,custumer);
+            case 'doanhthubanhang':
+                return fGetGeneralSalesByDate();
+            case 'doanhthulaigop':
+                return fGetSalesRevenueByProc();
+            default:
+                return null; 
+        }
     }
 
     "Hàm lấy dữ liệu Phiếu giao hàng"
@@ -609,7 +654,7 @@ export default function Invoice({navigation,route}) {
                     let newData = dt.map((item) => {
                         return {
                             ...item,
-                            ModifiedObjID: clsFunc.fRenameObjIDChanged(item.ModifiedObjID)
+                            ModifiedObjID: clsFunc.fRenameModifiedObjID(item.ModifiedObjID)
                         };
                     });
                     setData(newData);
@@ -624,7 +669,7 @@ export default function Invoice({navigation,route}) {
         })
     }
 
-    "Hàm lấy dữ liệu Báo cáo doanh thu"
+    "Hàm lấy dữ liệu Báo cáo doanh thu bán hàng nhân viên"
     async function fGetGeneralSalesByDate(){
 
         let std = moment(startDay).format("YYYY-MM-DD");
@@ -641,7 +686,7 @@ export default function Invoice({navigation,route}) {
             setvisibleLoadData(true);
             await GetGeneralSalesByDate(std,td,vS,'','',setvisibleLoadData).then((data)=>{
                 if(data.status==200){
-                    console.log("Get dữ liệu báo cáo doanh thu: ",data.data.ObjectData);
+                    console.log("Get dữ liệu báo cáo doanh thu bán hàng: ",data.data.ObjectData);
                     if(data.data.ObjectData.length > 0) {
                         setData(data.data.ObjectData);
                         setFilteredData(data.data.ObjectData);
@@ -655,7 +700,38 @@ export default function Invoice({navigation,route}) {
         }
     }
 
-    "Hàm nạp dữ liệu ch List data detail GetSaleVoucher khi người dùng chọn dòng item"
+    "Hàm lấy dữ liệu Báo cáo lãi gộp"
+    async function fGetSalesRevenueByProc(){
+
+        let std = moment(startDay).format("YYYY-MM-DD");
+        let td = moment(toDay).format("YYYY-MM-DD");
+        let vS = vStaff != null? vStaff : '';
+
+        let checkBeforeGetData = clsFunc.fCheckFromToDate(std,td);
+        
+        if(!checkBeforeGetData){
+            setloaithongbao('WarningDate');
+            setmodalthongbao(true);
+            return;
+        }else{
+            setvisibleLoadData(true);
+            await GetSalesRevenueByProc(std,td,vS,'','',setvisibleLoadData).then((data)=>{
+                if(data.status==200){
+                    console.log("Get dữ liệu Báo cáo lãi gộp: ",data.data.ObjectData);
+                    if(data.data.ObjectData.length > 0) {
+                        setData(data.data.ObjectData);
+                        setFilteredData(data.data.ObjectData);
+                        setTotalRow(data.data.SummaryData);                   
+                    }else{
+                        setData([]);
+                        setFilteredData([]);
+                    }
+                }
+            })
+        }
+    }
+
+    "Hàm nạp dữ liệu cho List data detail GetSaleVoucher khi người dùng chọn dòng item"
     async function fDetailItem(item){
         
         let vDate = moment(item.VoucherDate,"DD/MM/YYYY").format("YYYY-MM-DD");
@@ -752,13 +828,13 @@ export default function Invoice({navigation,route}) {
 
         return (
             <Modal visible={modalphieubanhang} animationType="slide" transparent={true}>
-                <View style={{...ModalNewStyle.modalOverlay}}>
-                    <View style={{...ModalNewStyle.modalContainer}}>
-                        <Text style={style.title}>PHIẾU BÁN HÀNG</Text>
-                        <Text style={style.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
-                        <Text style={style.customer}>Khách hàng: {itemselect.TradeName}</Text>
+                <View style={ModalPhieugiaohang.modalOverlay/*{...ModalNewStyle.modalOverlay}*/}>
+                    <View style={ModalPhieugiaohang.modalContainer/*{...ModalNewStyle.modalContainer}*/}>
+                        <Text style={ModalPhieugiaohang.title}>PHIẾU BÁN HÀNG</Text>
+                        <Text style={ModalPhieugiaohang.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
+                        <Text style={ModalPhieugiaohang.customer}>Khách hàng: {itemselect.TradeName}</Text>
         
-                        <View style={{ height:'60%'}}>
+                        <View style={{ height:'auto',maxHeight:'55%'/*'60%'*/}}>
                                 <ScrollView
                                     horizontal
                                     contentContainerStyle={{
@@ -842,13 +918,13 @@ export default function Invoice({navigation,route}) {
                                 </ScrollView>
                         </View>
         
-                        <Text style={style.total}>Tổng thành tiền: {totalRowDetail.ConvertAmount}</Text>
+                        <Text style={ModalPhieugiaohang.total}>Tổng thành tiền: {totalRowDetail.ConvertAmount}</Text>
                        
                         <TouchableOpacity onPress={()=>{
                             setVisibleKeys(phieubanhang)
                             setmodalphieubanhang(false);    
-                        }} style={style.closeButton}>
-                            <Text style={style.closeText}>Đóng</Text>
+                        }} style={ModalPhieugiaohang.closeButton}>
+                            <Text style={ModalPhieugiaohang.closeText}>Đóng</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -935,7 +1011,7 @@ export default function Invoice({navigation,route}) {
                                                                 color: clsFunc.fSetColorForItemSpecial('color',"ModifiedType",item)
                                                             }}
                                                         >
-                                                            {item[key]}
+                                                            {clsFunc.fFormatDataItem(key,item)}
                                                         </Text> 
                                                     ))}
                                                 </TouchableOpacity>
@@ -1033,44 +1109,4 @@ const style = StyleSheet.create({
         textAlign: 'right',
     },
 
-    //Modal Phiếu giao hàng
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    subTitle: {
-        fontSize: 14,
-        textAlign: 'center',
-        marginBottom: 5,
-    },
-    customer: {
-        marginVertical: 8,
-        fontWeight: '600',
-    },
-
-    total: {
-        fontWeight: 'bold',
-        fontSize: 15,
-        marginTop: 10,
-    },
-    kl: {
-        fontStyle: 'italic',
-        fontSize: 14,
-    },
-    note: {
-        color: 'red',
-        marginTop: 5,
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        backgroundColor: '#007bff',
-        padding: 10,
-        marginTop: 15,
-        borderRadius: 5,
-    },
-    closeText: {
-        color: 'white',
-        textAlign: 'center',
-    },
 });

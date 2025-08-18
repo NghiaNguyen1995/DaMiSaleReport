@@ -10,5 +10,4 @@ export const handleSearch=(error)=>{
         }else{
           return thongtin
         } 
-  
 }

@@ -7,11 +7,22 @@ export class clsSignalRService {
     static connection = null;
 
     static async startConnection() {
+        
+        async function getOrCreateUserId() {
+            let userID = JSON.parse(await AsyncStorage.getItem('user'));
+    
+            return userID;
+        }
+
+        // Dùng khi connect SignalR:
+        const userID = await getOrCreateUserId();
+
         this.connection = new HubConnectionBuilder()
-        //.withUrl('http://simsoft.com.vn:8082/notificationHub', {
-        .withUrl('http://192.168.1.15:5055/notificationHub',{
+        .withUrl('http://simsoft.com.vn:8082/notificationHub', {
+        //.withUrl('http://192.168.1.15:5055/notificationHub',{
             //accessTokenFactory: () => 'your_token', // nếu có token
             headers: {
+                'UserID': userID.ID? userID.ID : '',
                 'DaMiPartnerGUID': DaMiHeader[0].DaMiPartnerGUID,
                 'DaMiPartnerToken': DaMiHeader[0].DaMiPartnerToken
             }
@@ -20,25 +31,15 @@ export class clsSignalRService {
         .configureLogging(LogLevel.Information)
         .withAutomaticReconnect()
         .build();
-
-        console.log("Có gắng url SignalR")
         
-        let datamessage = JSON.parse(await AsyncStorage.getItem('notification')) || [];
+        //let datamessage = JSON.parse(await AsyncStorage.getItem('notification')) || [];
 
         this.connection.on('ReceiveNotification', (message) => {
 
-            clsPushNotification.showLocalNotification('Thông báo mới', message); //Thông báo khi trạng thái app online
-            
-            datamessage.push({
-                title: 'Thông báo mới',
-                message: "Nội dung: "+message.modifiedBy+" vào lúc "+message.time,
-                time: new Date().toISOString() 
-            }); // Tạo danh sách thông báo và lưu vào Storage Local thiết bị
-
-            // Lưu lại vào AsyncStorage
-            AsyncStorage.setItem('notification', JSON.stringify(datamessage));
+            console.log('message back end: ',message);
+            clsPushNotification.showLocalNotification('Thông báo', message); //Thông báo khi trạng thái app online
+        
         });
-
 
         try {
             await this.connection.start();

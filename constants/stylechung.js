@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetDevice } from "../src/screens/Function/Chung/functionInfoDevice";
 
 const windowWidth = Dimensions.get('window').width;
+//#region Chung
 
 export const HeaderStyle = {
     headerTrangChu: { 
@@ -268,8 +269,9 @@ export const ModalStyle = {
         shadowRadius: 2,
         elevation: 6,
         backgroundColor:'white',
-        width:'97%',
-        marginLeft:6
+        width:'90%',
+        borderWidth:2,
+        borderColor:COLORS.skin2.bgflatlist
     },  
 }
 
@@ -324,6 +326,9 @@ const Info =()=>{
     })
 }
 
+//#endregion
+
+//#region Header, Body, Footer Style
 export const containerHeader={
     ctnHeader:Info(),
     headerCaption:{
@@ -602,46 +607,171 @@ export const footerthongke =(data)=>{
     )
     
 }
+//#endregion
 
 //#region  DaMi sử dụng
-export const ModalNewStyle={
-    modalOverlay: {
+
+//Bản view Modal đẹp và gọn:
+export const ModalStyle3={
+    overlay: {
         flex: 1,
-        backgroundColor: '#00000099',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
-        padding: 5,
+        alignItems: 'center',
     },
     modalContainer: {
-        backgroundColor: 'white',
-        borderRadius: 8,
-        padding: 5,
-        maxHeight: 'auto',
-    },
-    
-    modalOverlay1: {
-        flex:1,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 0,
-    },
-    innerOverlay: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
         width: '90%',
-        alignItems: 'center',
-    },
-    modalContainer1: {
-        width: '100%',
-        backgroundColor: 'white',
-        borderRadius: 12,
-        paddingVertical: 16,
+        padding: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.25,
-        shadowRadius: 8,
+        shadowRadius: 10,
         elevation: 10,
+        borderWidth:2,
+        borderColor:COLORS.skin2.bgflatlist
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: COLORS.skin2.bgflatlist,
+        textAlign: 'center',
+        marginBottom: 15,
+    },
+    row: {
+        marginBottom: 14,
+        flexDirection:'row',
+        gap:15
+    },
+    label: {
+        fontSize: 13,
+        textAlign:'left',
+        fontWeight: 'bold',
+        color: COLORS.black,
+    },
+    value: {
+        fontSize: 13,
+        color: 'black',
+        width: windowWidth*0.65,
+        
+    },
+    closeButton: {
+        marginTop: 10,
+        backgroundColor: COLORS.skin2.bgheader,
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontSize: 17,
+        fontWeight: 'bold',
     },
 }
 
+export const ModalPhieugiaohang={
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        width: '90%',
+        padding: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 10,
+        height:'auto',
+        maxHeight:'55%',
+        borderWidth:2,
+        borderColor:COLORS.skin2.bgflatlist
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color:COLORS.skin2.bgflatlist
+    },
+    subTitle: {
+        fontSize: 14,
+        textAlign: 'center',
+        marginBottom: 5,
+    },
+    customer: {
+        marginVertical: 8,
+        fontWeight: '600',
+    },
+    total: {
+        fontWeight: 'bold',
+        fontSize: 15,
+        marginTop: 10,
+    },
+    closeButton: {
+        marginTop: 10,
+        backgroundColor: COLORS.skin2.bgheader,
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+     
+    },
+    closeText: {
+        color: '#fff',
+        fontSize: 17,
+        fontWeight: 'bold',
+    },
+}
+
+export const ModalLich={
+    // Style cho Modal Lịch
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)', // nền mờ
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '95%',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        overflow: 'hidden',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        paddingBottom: 15,
+        borderWidth:2,
+        borderColor:COLORS.skin2.bgflatlist
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: COLORS.skin2.bgfooter,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        //borderTopLeftRadius: 12,
+        //borderTopRightRadius: 12,
+    },
+    headerTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    todayText: {
+        fontSize: 14,
+        color: 'white',
+        textAlign: 'right',
+    },
+}
+
+//Style cho Grid (FlatList)
 export const GridStyle = (totalColumn,key) => ({
     //Dòng Header
     headerRow: {
@@ -682,48 +812,58 @@ export const GridStyle = (totalColumn,key) => ({
     }
 });
 
-export function fSetTextAlignForText(key){
-    if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('VoucherNo')||key.includes('NoteDetails')){
-        return 'left';
-    }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('Date')||key.includes('UnitName')){
-        return 'center';
+    //#region Function set TextAlign, WidthRowFlatListitem dựa vào key
+    export function fSetTextAlignForText(key){
+        ["TitleNotify","MsgNotify","EventsDate","Action","ModifiedObjID","ModifiedType","UserID","ComputerName"]
+        if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('VoucherNo')||key.includes('NoteDetails')||key.includes('MsgNotify')){
+            return 'left';
+        }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('Date')
+            ||key.includes('UnitName')||key.includes('TitleNotify')||key.includes('Action')
+            || key.includes('ModifiedObjID') || key.includes('ModifiedType')){
+            return 'center';
+        }
+        else{
+            return 'right';
+        }
     }
-    else{
-        return 'right';
+
+    export function fSetWidthRowFlatListItem(totalColumn, key) {
+        
+    // Tỷ lệ phần trăm cho từng loại cột (chỉ dùng khi >= 4 cột)
+    const ratio = {
+        large: 0.25,   // ~25% cho cột "tên" hoặc "ghi chú"
+        small: 0.13,   // ~13% cho ID, STT, đơn vị
+        medium: 0.25,  // ~25% cho ngày, số chứng từ
+        default: 0.30, // ~30% cho các cột dữ liệu số
+    };
+//ModifiedObjID,ModifiedType    
+    if (totalColumn >= 4) {
+        if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) 
+        {
+        return Math.floor(windowWidth * ratio.large);
+        } else if ( (key.includes('ID') && !key.includes('ModifiedObjID') && !key.includes('UserID') &&!key.includes('RowUniqueID'))
+            || key.includes('UnitName')  || key.includes('RowNumber')) 
+        {
+        return Math.floor(windowWidth * ratio.small);
+        } else if (key.includes('Date') || key.includes('VoucherNo') || key.includes('RowUniqueID')
+            || key.includes("TypeChanged") || key.includes('ModifiedObjID') || key.includes('UserID') 
+            || key.includes('TitleNotify') || key.includes('ModifiedType')) 
+        {
+        return Math.floor(windowWidth * ratio.medium);
+        } else {
+        return Math.floor(windowWidth * ratio.default);
+        }
     }
-}
 
-export function fSetWidthRowFlatListItem(totalColumn, key) {
-    
-  // Tỷ lệ phần trăm cho từng loại cột (chỉ dùng khi >= 4 cột)
-  const ratio = {
-    large: 0.25,   // ~25% cho cột "tên" hoặc "ghi chú"
-    small: 0.13,   // ~13% cho ID, STT, đơn vị
-    medium: 0.25,  // ~25% cho ngày, số chứng từ
-    default: 0.30, // ~30% cho các cột dữ liệu số
-  };
-
-  if (totalColumn >= 4) {
-    if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) {
-      return Math.floor(windowWidth * ratio.large);
-    } else if ((key.includes('ID')&&!key.includes('ObjIDChanged'))|| key.includes('RowNumber') || key.includes('UnitName')) {
-      return Math.floor(windowWidth * ratio.small);
-    } else if (key.includes('Date') || key.includes('VoucherNo')|| key.includes("TypeChanged")||key.includes('ObjIDChanged')) {
-      return Math.floor(windowWidth * ratio.medium);
-    } else {
-      return Math.floor(windowWidth * ratio.default);
+    // Nếu ít cột (1-3), chia đều
+    if (totalColumn >= 1 && totalColumn <= 3) {
+        return Math.floor((windowWidth * 0.97) / totalColumn);
     }
-  }
 
-  // Nếu ít cột (1-3), chia đều
-  if (totalColumn >= 1 && totalColumn <= 3) {
-    return Math.floor((windowWidth * 0.97) / totalColumn);
-  }
-
-  // Mặc định
-  return Math.floor((windowWidth * 0.97) / 4);
-}
-
+    // Mặc định
+    return Math.floor((windowWidth * 0.97) / 4);
+    }
+    //#endregion
 
 //#endregion
 

@@ -66,6 +66,7 @@ const documentopen = require('../assets/icons/documentopen.png')
 const documentclose = require('../assets/icons/documentclose.png')
 const report_warehouse = require('../assets/icons/report_warehouse.png')
 const report_doanhthubanhang = require('../assets/icons/report_doanhthubanhang.png')
+const report_doanhthulaigop = require('../assets/icons/report_doanhthulaigop.png')
 const report_debt = require('../assets/icons/report_debt.png')
 const report_delivery = require('../assets/icons/report_delivery.png')
 
@@ -138,6 +139,7 @@ export default {
     documentclose,
     //Home DaMi
     report_doanhthubanhang,
+    report_doanhthulaigop,
     report_warehouse,
     report_debt,
     report_delivery

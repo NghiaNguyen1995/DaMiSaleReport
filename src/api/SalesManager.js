@@ -2,7 +2,7 @@ import { handleSearch } from '../screens/Function/Chung/functionContentError';
 import { DAMI_API } from './ApiManager';
 import { DaMiHeader } from './SetUpDaMi';
 
-//Hàm lấy dữ liệu Báo cáo Tồn kho đầy đủ
+// GetInventoryBalanceByDate: Báo cáo Tồn kho đầy đủ
 export const GetInventoryBalanceByDate = async(taikhoan,makho,tungay,denngay,setload) => {
     console.log('Biến truyền vào tồn kho đầy đủ: ',taikhoan,makho,tungay,denngay)
     try {
@@ -23,7 +23,7 @@ export const GetInventoryBalanceByDate = async(taikhoan,makho,tungay,denngay,set
     }
 }
 
-// Hàm lấy dữ liệu Báo cáo Tồn kho đến ngày (dạng rút gọn):
+// GetEndInvBalanceByDate: Báo cáo Tồn kho đến ngày (dạng rút gọn):
 export const GetEndInvBalanceByDate = async(taikhoan,makho,tungay,denngay,setload) => {
   console.log('Biến truyền vào tồn kho rút gọn: ',taikhoan,makho,tungay,denngay)
     try {
@@ -44,7 +44,7 @@ export const GetEndInvBalanceByDate = async(taikhoan,makho,tungay,denngay,setloa
     }
 }
 
-// Hàm lấy dữ liệu Báo cáo Công nợ (dạng đầy đủ):
+// GetCustomerBalancebyDate: Báo cáo Công nợ (dạng đầy đủ):
 export const GetCustomerBalancebyDate = async(taikhoan,tungay,denngay,setload) => {
     console.log('Biến truyền vào công nợ đầy đủ: ',taikhoan,tungay,denngay)
     try {
@@ -65,7 +65,7 @@ export const GetCustomerBalancebyDate = async(taikhoan,tungay,denngay,setload) =
     }
 }
 
-// Hàm lấy dữ liệu Báo cáo Công nợ đến ngày (dạng rút gọn):
+// GetEndCustBalancebyDate: Báo cáo Công nợ đến ngày (dạng rút gọn):
 export const GetEndCustBalancebyDate = async(taikhoan,tungay,denngay,setload) => {
     console.log('Biến truyền vào công nợ rút gọn: ',taikhoan,tungay,denngay)
     try {
@@ -88,7 +88,7 @@ export const GetEndCustBalancebyDate = async(taikhoan,tungay,denngay,setload) =>
     }
 }
 
-// Load Dm Tài khoản Công Nợ
+// GetChartAccount: Danh mục tài khoản công nợ
 export const GetChartAccount = async() => {
     try {
       const result = await DAMI_API.get('GetChartAccount', {
@@ -107,7 +107,7 @@ export const GetChartAccount = async() => {
     }
 }
 
-// Load Dm Kho
+// GetWareHouseList: Danh mục kho
 export const GetWareHouseList = async() => {
 
     try {
@@ -145,7 +145,7 @@ export const GetEmployeeList = async() => {
     }
 }
 
-// Login
+// Login: Đăng nhập
 export const GetLogin = async(username,password,setload) => {
     try {
       const result = await DAMI_API.get(`Login?sUserID=${username}&sUserPass=${password}`, {
@@ -164,7 +164,7 @@ export const GetLogin = async(username,password,setload) => {
       return handleSearch(error);
     }
 }
-// Login
+// ResetPassword: Reset password
 export const ResetPassword = async(data) => {
     try {
       const result = await DAMI_API('ResetPassword', {
@@ -202,10 +202,9 @@ export const GetSalesVoucher = async(vVoucherDate,sVoucherNo,sCustomerName,sSale
     }
 }
 
-
 // GetGeneralSalesByDate: Doanh thu bán hàng theo nhân viên
 export const GetGeneralSalesByDate = async(vFromday,vToDay,sSalesManID,sItemGroupID,sWareHouseID,setload) => {
-    try {
+ try {
       const result = await DAMI_API.get(`GetGeneralSalesByDate?vFromDate=${vFromday}&vToDate=${vToDay}&sSalesManID=${sSalesManID}&sItemGroupID=${sItemGroupID}&sWareHouseID=${sWareHouseID}`, {
           //method: 'GET',
           headers: {
@@ -222,16 +221,42 @@ export const GetGeneralSalesByDate = async(vFromday,vToDay,sSalesManID,sItemGrou
       return handleSearch(error)
     }
 }
+// GetSalesRevenueByProc: Gộp cả 2 Proceduce SL_spRptGeneralSalesByDate và SL_spRptGeneralGrossProfitByItem
+export const GetSalesRevenueByProc = async(vFromday,vToDay,sSalesManID,sItemGroupID,sWareHouseID,setload) => {
+    try {
+      const result = await DAMI_API.get(`GetSalesRevenueByProc?vFromDate=${vFromday}&vToDate=${vToDay}&sSalesManID=${sSalesManID}&sItemGroupID=${sItemGroupID}&sWareHouseID=${sWareHouseID}`, {
+          //method: 'GET',
+          headers: {
+            'content-type': 'application/json',
+            'DaMiPartnerGUID': DaMiHeader[0].DaMiPartnerGUID,
+            'DaMiPartnerToken': DaMiHeader[0].DaMiPartnerToken
+          },
+          //data: JSON.stringify(data)
+      });
+      setload(false);
+      return result;
+    } catch (error) {
+      setload(false);
+      return handleSearch(error)
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+// GetNotification: Danh sách thông báo
+export const GetNotification = async(setload) => {
+    try {
+      const result = await DAMI_API.get(`GetNotification`, {
+          //method: 'GET',
+          headers: {
+            'content-type': 'application/json',
+            'DaMiPartnerGUID': DaMiHeader[0].DaMiPartnerGUID,
+            'DaMiPartnerToken': DaMiHeader[0].DaMiPartnerToken
+          },
+          //data: JSON.stringify(data)
+      });
+      setload(false);
+      return result;
+    } catch (error) {
+      setload(false);
+      return handleSearch(error)
+    }
+}

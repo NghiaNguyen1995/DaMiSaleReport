@@ -8,9 +8,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Import từ các file khác
-import { containerHeader, containerInput, containerView, GridStyle} from '../../../constants/stylechung'
+import { containerHeader, containerInput, containerView, GridStyle, ModalLich} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
-import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
+import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GetChartAccount, GetCustomerBalancebyDate, GetEndCustBalancebyDate, GetEndInvBalanceByDate, GetInventoryBalanceByDate, GetWareHouseList } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
@@ -78,7 +78,9 @@ export default function Report({navigation,route}) {
     "Function chia cột view loại từng loại đầy đủ hoặc rút gọn"
     function fLoaiXemView() {
         setvViewFull((prev) => {
+
             const newView = !prev;
+
             setvViewFull(newView); // đồng bộ với newView luôn
 
             if (route.params?.id === 'baocaotonkho') {
@@ -137,7 +139,7 @@ export default function Report({navigation,route}) {
                 <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
                     <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
-                        <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM THÊM</Text>
+                        <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM</Text>
 
                         <ScrollView style={{maxHeight: 300}}>
                             {allKeys.map(key => (
@@ -653,12 +655,12 @@ export default function Report({navigation,route}) {
         return(
             <Modal visible={openViewCalendar} animationType="fade" transparent={true}>
                 <TouchableWithoutFeedback onPress={() => setopenViewCalendar(false)}>
-                    <View style={styles.overlay}>
+                    <View style={ModalLich.overlay}>
                     <TouchableWithoutFeedback onPress={() => {}}>
-                        <View style={styles.modalContainer}>
+                        <View style={ModalLich.modalContainer}>
                         
                         {/* Header */}
-                        <View style={styles.modalHeader}>
+                        <View style={ModalLich.modalHeader}>
                             <TouchableOpacity onPress={() => setopenViewCalendar(false)}>
                             <Icon
                                 name="window-close"
@@ -667,15 +669,19 @@ export default function Report({navigation,route}) {
                             />
                             </TouchableOpacity>
 
-                            <Text style={styles.headerTitle}>CHỌN NGÀY</Text>
+                            <Text style={ModalLich.headerTitle}>CHỌN NGÀY</Text>
 
                             <TouchableOpacity onPress={() => {
-                            const today = new Date();
-                            setstartDay(today);
-                            setcalendarSelectedDate(today);
-                            setopenViewCalendar(false);
+                                const today = new Date();
+                                if(loaibamngay==='s'){
+                                    setstartDay(today);
+                                }else{
+                                    settoDay(today);
+                                }
+                                setcalendarSelectedDate(today);
+                                setopenViewCalendar(false);
                             }}>
-                            <Text style={styles.todayText}>Hôm{'\n'}nay</Text>
+                            <Text style={ModalLich.todayText}>Hôm{'\n'}nay</Text>
                             </TouchableOpacity>
                         </View>
 

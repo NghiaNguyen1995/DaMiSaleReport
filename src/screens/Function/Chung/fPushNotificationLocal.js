@@ -11,13 +11,19 @@ export class clsPushNotification{
 
             // Kiểm tra nếu app đang chạy foreground/background và click vào noti
             if (notification.userInteraction) {
-                console.log("Người dùng có nhấn vô thông báo")
+
+                console.log("Người dùng có nhấn vô thông báo");
+
+                let notifyData = notification.data?.rowUniqueID;
+                console.log('rowUniqueID click: ', notifyData);
+
                 // Dùng navigationRef để điều hướng
                 let data={
                   id: 'thongbao',
-                  description: "THÔNG BÁO"
+                  description: "THÔNG BÁO",
+                  dt: notifyData,
                 }
-
+                 
                 navigation.navigate(NameScreen.Thongbao,data);
             }
         },
@@ -45,7 +51,8 @@ export class clsPushNotification{
     PushNotification.localNotification({
       channelId: "DaMiSaleReport",
       title: title,
-      message: "Nội dung: "+message.modifiedBy+" vào lúc "+message.time,
+      message: message.message,
+      data: message, // <-- Truyền toàn bộ data vào userInfo
     });
   }
   

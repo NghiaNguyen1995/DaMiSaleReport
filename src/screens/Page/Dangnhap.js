@@ -16,9 +16,9 @@ import messaging from '@react-native-firebase/messaging'
 import RNFS from 'react-native-fs';
 import { icons, COLORS, FONTS } from '../../../constants';
 import { Alert } from 'react-native';
-import { FunctionViewThongBao } from '../Function/Chung/functionViewThongBao';
+import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 import { NameScreen } from '../../../constants/NameScreen';
-import { buttonStyle, containerInput, ModalNewStyle, ModalStyle } from '../../../constants/stylechung';
+import { buttonStyle, containerInput, ModalStyle } from '../../../constants/stylechung';
 import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder } from '../../Function/GoogleDrive/GetListFileGGDrive';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GetLogin, ResetPassword } from '../../api/SalesManager';
@@ -227,7 +227,7 @@ export default function Login({ navigation }) {
             <View style={{ width: '100%', height: '100%',alignItems: 'center', justifyContent: 'center',alignSelf:'center',marginTop:15}}>
                   <TouchableOpacity onPress={()=>{fSetImage()}}>
                     <Image  source={urlImage ? { uri: urlImage } : icons.logoDami}
-                            style={{ width: 280, height: 150 }} />
+                            style={{ marginTop: 10,width: 260, height: 130 }} />
                   </TouchableOpacity>
                   
                   <Text style={{ color: COLORS.app.title, fontSize: 25, fontWeight: 'bold', fontFamily: 'Roboto-Bold',marginTop:20 }}>{tencongty}</Text>
@@ -334,7 +334,8 @@ export default function Login({ navigation }) {
             <View style={{ ...containerInput.viewItem,width:'90%',height:50}}> 
                 <TextInput
                   style={{ ...containerInput.textLabel, width: windowWidth * 0.85 }}
-                  placeholder="Tài khoản"
+                  placeholder="Nhập tài khoản"
+                  placeholderTextColor={COLORS.black}
                   value={manv}
                   autoCapitalize='characters'
                   keyboardType='default'
@@ -345,7 +346,8 @@ export default function Login({ navigation }) {
             <View style={{ ...containerInput.viewItem,marginTop:20,width:'90%',height:50}}>
                 <TextInput
                   style={{ ...containerInput.textLabel, width: windowWidth * 0.75 }}
-                  placeholder="Mật khẩu"
+                  placeholder="Nhập mật khẩu"
+                  placeholderTextColor={COLORS.black}
                   value={pw}
                   keyboardType='default'
                   secureTextEntry={seePassword}

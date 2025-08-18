@@ -1,87 +1,215 @@
 import React, { useState,useEffect} from 'react'
-import { Text, View,TouchableWithoutFeedback, KeyboardAvoidingView,Keyboard,TouchableOpacity, FlatList,ScrollView,TextInput, Image } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text, View,TouchableWithoutFeedback, KeyboardAvoidingView,Keyboard,TouchableOpacity,
+     FlatList,ScrollView,TextInput, Image, Modal, StyleSheet, 
+     Dimensions} from 'react-native'
 
 // Import từ các file khác
-import { containerHeader, containerView, GridStyle} from '../../../constants/stylechung'
+import { containerHeader, containerView, GridStyle, ModalStyle3} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, icons } from '../../../constants';
 import { clsFunc } from '../Function/Chung/fSupport';
+import { GetNotification } from '../../api/SalesManager';
+import { ViewLoadingAnimation } from '../Function/fViewLoading';
+import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const Notification = ({navigation,route}) => {
 
+    let key = 'RowUniqueID';
 
-  const [titleHeaderComponent,settitleHeaderComponent] = useState([])
-  const defaultkey = ["title", "message", "time"];
-  const [visibleKeys, setVisibleKeys] = useState(defaultkey);
+    const [titleHeaderComponent,settitleHeaderComponent] = useState([])
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [filters, setFilters] = useState({});
 
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [filters, setFilters] = useState({});
+    const [item, setItem] = useState(route.params?.dt);
+
+    //Modal load dữ liệu
+    const[visibleLoadData,setvisibleLoadData]=useState(false)
+
+    //Modal View detail thông báo
+    const [visibleThongBao,setvisibleThongBao] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    // Set loại thông báo hiển thị
+    const [modalthongbao,setmodalthongbao] = useState(false)
+    const [loaithongbao,setloaithongbao] = useState('')
+
+    //#region Chức năng xem thêm thông tin
+    // Lấy các trường chính để View 
+    //const defaultkey = ["TitleNotify","MsgNotify","EventsDate","Action","ModifiedObjID","ModifiedType","ComputerName"];
+    const defaultkeyRutgon = ["TitleNotify","MsgNotify","EventsDate","UserID","ComputerName"];
+    const [visibleKeys, setVisibleKeys] = useState(defaultkeyRutgon);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
   
-  useEffect(()=>{
-    const unsubscribe = navigation.addListener('focus', () => {
-        fInitLoad()
-    });
+    let allKeys = Object.keys(data[0] || {});
   
-    return () => {unsubscribe};
-  },[navigation])
-
-  //#region Function Init
-  "Function load thiết lập"
-  function fInitLoad(){
-    settitleHeaderComponent(route.params);   
-    fLoadNotifications();
-    if(data != ""){
-      fInitFilter(data,setFilters)
+    // Mở modal thì set selectedKeys hiện tại
+    function fOpenSelectModal() {
+        setSelectedKeys(visibleKeys);
+        setModalVisible(true);
     }
-  }
-      
-  "Function Init Filter data = trống"
-  function fInitFilter(data,setFilters){
-    // Khởi tạo filters trống
-    const initialFilters = {};
-    Object.keys(data[0]).forEach(key => {
-      initialFilters[key] = '';
-    });
-    setFilters(initialFilters);
-  }
-  //#endregion
- 
-  //#region Get danh sách thông báo từ bộ nhớ cục bộ
-  async function fLoadNotifications() {
-    try {
-      const storedData = await AsyncStorage.getItem('notification');
-      const parsedData = storedData ? JSON.parse(storedData) : [];
-
-      if (Array.isArray(parsedData)) {
-        const currentDate = new Date();
-
-        // Lọc ra những item trong vòng 7 ngày gần nhất
-        const dt = parsedData.filter(item => {
-          const itemDate = new Date(item.time);
-          const diffTime = currentDate - itemDate; 
-          const diffDays = diffTime / (1000 * 60 * 60 * 24); 
-
-          return diffDays <= 7;
+  
+    //Hàm xử lý khi user xác nhận chọn thêm fields
+    function fHandleConfirmSelectFields(newSelectedKeys) {
+        setVisibleKeys(newSelectedKeys);
+  
+        // Tạo dataShow mới
+        const newDataShow = data.map(item => {
+            let obj = {};
+            newSelectedKeys.forEach(key => {
+                obj[key] = item[key];
+            });
+            return obj;
         });
-
-        // Ghi lại vào AsyncStorage chỉ các item còn lại
-        await AsyncStorage.setItem('notification', JSON.stringify(dt));
-
-        // Hiển thị
-        setData(dt.reverse()); // Hiển thị mới nhất trước
-        setFilteredData(dt.reverse());
+  
+        setFilteredData(newDataShow);
+  
+        setModalVisible(false);
       }
+  
+    const ModalSelectFields = ({modalVisible,setModalVisible,allKeys,selectedKeys,setSelectedKeys,onConfirm}) => {
+        return (
+              <Modal visible={modalVisible} animationType="fade" transparent={true}>
+                  <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                      <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
+                          <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
+                          <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM THÊM</Text>
+  
+                          <ScrollView style={{maxHeight: 300}}>
+                              {allKeys.map(key => (
+                              <TouchableOpacity
+                                  key={key}
+                                  onPress={() => {
+                                  if (selectedKeys.includes(key)) {
+                                      setSelectedKeys(selectedKeys.filter(k => k !== key));
+                                  } else {
+                                      setSelectedKeys([...selectedKeys, key]);
+                                  }
+                                  }}
+                                  style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  marginBottom: 5,
+                                  }}>
+                                  <View 
+                                  style={{
+                                      height: 20,
+                                      width: 20,
+                                      borderWidth: 1,
+                                      borderColor: '#333',
+                                      backgroundColor: selectedKeys.includes(key) ? '#333' : 'white',
+                                      marginRight: 10,
+                                  }}
+                                  />
+                                  <Text>{clsFunc.fRenameHeaderTable(key)}</Text>
+                              </TouchableOpacity>
+                              ))}
+                          </ScrollView>
+  
+                          <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 15}}>
+                              <TouchableOpacity onPress={() => setModalVisible(false)} style={{padding: 10}}>
+                              <Text>Hủy</Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                              onPress={() => {
+                                  onConfirm(selectedKeys);
+                              }}
+                              style={{padding: 10}}
+                              >
+                              <Text style={{color: 'blue'}}>Xác nhận</Text>
+                              </TouchableOpacity>
+                          </View>
+                          </View>
+                      </View>
+                  </TouchableWithoutFeedback>
+              </Modal>
+             
+        );
+    };
+  
+    //#endregion
 
-    } catch (error) {
-      console.error('Lỗi khi đọc notification từ AsyncStorage', error);
+    //#region // Xử lý khi thay đổi chuyển screen 
+    useEffect(()=>{
+        const unsubscribe = navigation.addListener('focus', () => {
+            fInitLoad();
+        });
+        return () => {unsubscribe};
+    },[navigation])
+    //#endregion
+    
+    //#region Xử lý khi thay đổi dữ liệu
+    useEffect(() => {
+        if (route.params?.dt) {
+            fInitLoad(); // nếu cần, load lại data
+            setItem(route.params.dt);
+        }
+    }, [route.params?.dt]);
+
+    useEffect(() => {
+        if (item && data.length > 0) {
+                fSetDataFromNotification(key, item);
+        }
+    }, [item, data]);
+    //#endregion
+
+    //#region Xử lý selectedItem thay đổi
+    useEffect(() => {
+        if (selectedItem && selectedItem.length > 0) {
+            console.log('selectedItem: ',selectedItem);
+            clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao, true);
+        }
+    }, [selectedItem]);
+    //#endregion
+
+    //#region Function Init
+    "Function load thiết lập"
+    function fInitLoad(){
+        settitleHeaderComponent(route.params);
+        
+        fLoadNotifications();
+    
+        if(data != ""){
+            fInitFilter(data,setFilters)
+        }
     }
-  };
-  //#endregion
+        
+    "Function Init Filter data = trống"
+    function fInitFilter(data,setFilters){
+        // Khởi tạo filters trống
+        const initialFilters = {};
+        Object.keys(data[0]).forEach(key => {
+            initialFilters[key] = '';
+        });
+        setFilters(initialFilters);
+    }
+    //#endregion
+ 
+    //#region Get danh sách thông báo
+    async function fLoadNotifications() {
+        try {
+        await GetNotification(setvisibleLoadData).then((data)=>{
+            if(data.status==200 && data.data?.ObjectData?.length > 0){
+                setData(data.data.ObjectData)
+                setFilteredData(data.data.ObjectData);
+                console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData)
+            }else{
+                console.log('Status thông báo trả về: ',data.status);
+                console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData);
+            }
+        })
+        } catch (error) {
+        console.error('Lỗi khi đọc notification từ AsyncStorage', error);
+        }
+    };
+    //#endregion
 
-  //#region "Function Filter Data"
+    //#region "Function Filter Data"
     "Filter theo từng cột của FlatList"
     function fHandleFilterChange(key, value) {
         const newFilters = { ...filters, [key]: value };
@@ -105,107 +233,224 @@ export const Notification = ({navigation,route}) => {
         setFilteredData(newData);
     }
 
-    
+    //Hàm cho dữ liệu từ người dùng nhấn thông báo ở thanh thông báo
+    function fSetDataFromNotification(key, value){
+        const newFilters = { ...filters, [key]: value };
+        setFilters(newFilters);
+       
+        const newData = data.filter(item => {
+            return Object.keys(newFilters).every(k => {
+                const filterVal = newFilters[k]?.trim() || '';
+                const itemVal = item?.[k]?.toString() || '';
+                return itemVal.includes(filterVal);
+            });
+        });
 
-  //#endregion
+        console.log('newData sau khi filter: ',JSON.stringify(newData));
 
-  const ComponentHeader=()=>{   
-      return( 
-          <View style={{...containerHeader.ctnHeader,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                
-              <TouchableOpacity 
-                  onPress={()=>{navigation.navigate(NameScreen.TrangChu,'')}} 
-                  style={{paddingLeft:10,width:'30%'}}>
-                    <Image
-                      source={icons.trove}
-                      style={{
-                        width: 30,
-                        height: 30,
-                        tintColor: 'white',
-                      }} 
-                    />
-              </TouchableOpacity>
+        setSelectedItem(newData);
+        setFilteredData(newData);
+    }
+    //#endregion
 
-              <Text style={{...containerHeader.headerCaption,width:'30%'}}>{titleHeaderComponent.description}</Text>
-                  
-              <View style={{width:'30%'}}>                 
-              </View>
-          </View>
-      )
-  }
-      
-  let keys = visibleKeys;
-
-  return (
-    <TouchableWithoutFeedback onPress={()=>{ Keyboard.dismiss()}} accessible={false}>
-        <KeyboardAvoidingView  style={{ flex: 1, backgroundColor: 'white' }}>
-            <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}> 
-                <ComponentHeader />
-                <View style={{ flex: filteredData.length>0?1:null}}>
-                  <ScrollView
-                    horizontal
-                    keyboardShouldPersistTaps="handled"
-                  >
-                    <View style={{...containerView('report',data)}}>
-                        {/* Header */}
-                        <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
-                            {keys.map(key => (
-                                <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
-                            ))}
-                        </View>
-    
-                        {/* Filter row */}
-                        <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
-                            {keys.map(key => (
-                                <TextInput                          
-                                    key={key}
-                                    style={{...GridStyle(visibleKeys.length,key).filterInput}}
-                                    placeholder={''}
-                                    value={filters[key]}
-                                    onChangeText={value => fHandleFilterChange(key, value)}
-                                />
-                            ))}
-                        </View>
-            
-                        <FlatList
-                            data={filteredData} // luôn data gốc
-                            keyExtractor={(item, index) => index.toString()}
-                            style={{ height: 'auto'}} 
-                            ListEmptyComponent={() => (
-                                <View style={{flex:1,justifyContent:"center",alignItems:'center'}}>
-                                    <Text style={{textAlign:'center',textAlignVertical:'center',}}>Không có dữ liệu</Text>
-                                </View>
-                            )}
-                            renderItem={({ item }) => {
-                                if (!item) return null;                    
-                                const show = !!item && Object.keys(filters).every(k =>
-                                    (item?.[k] ?? '').toString().toLowerCase().includes((filters[k] ?? '').toLowerCase())
-                                );
-                                        
-                                if (!show) return null;
-    
-                                return (
-                                    <View style={{...GridStyle(visibleKeys.length,'').dataRow}} >
-                                        {keys.map(key => (
-                                            <Text 
-                                                key={key} 
-                                                style={{...GridStyle(visibleKeys.length,key).dataCell}}
-                                                onPress={()=>{}}>
-                                                    {clsFunc.fFormatDataItem(key,item)}
-                                            </Text>
-                                        ))}
-                                    </View>
-                                );
-                            }}
+    //#region Component View cho Header, Body, Footer
+    const ComponentHeader=()=>{   
+        return( 
+            <View style={{...containerHeader.ctnHeader,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                    
+                <TouchableOpacity 
+                    onPress={()=>{navigation.navigate(NameScreen.TrangChu,'')}} 
+                    style={{paddingLeft:10,width:'30%'}}>
+                        <Image
+                        source={icons.trove}
+                        style={{
+                            width: 30,
+                            height: 30,
+                            tintColor: 'white',
+                        }} 
                         />
-                                     
+                </TouchableOpacity>
+
+                <Text style={{...containerHeader.headerCaption,width:'30%'}}>{titleHeaderComponent.description}</Text>
+                    
+        
+                <TouchableOpacity 
+                    //onPress={fOpenSelectModal}
+                    onPress={()=>{
+                        setloaithongbao('NoDetail');
+                        setmodalthongbao(true);
+                    }}
+                    style={{alignItems:'flex-end',paddingRight:10,width:'30%'}}>
+                    <Image
+                        source={icons.more}
+                        style={{
+                            width: 30,
+                            height: 30,
+                            tintColor: 'white',                     
+                        }} 
+                    />
+                </TouchableOpacity>               
+                
+            </View>
+        )
+    }
+    //#endregion
+
+    //#region Gắn key visilbe từ Data List
+    let keys = visibleKeys;
+    //#endregion
+
+    //#region Modal detail Thông báo
+    const ModalDetailThongBao = ({ visibleThongBao, setvisibleThongBao, itemselect }) => {
+        return (
+            <Modal transparent visible={visibleThongBao} animationType="fade">
+                <TouchableWithoutFeedback onPress={() => setvisibleThongBao(false)}>
+                    <View style={ModalStyle3.overlay}>
+                    <View style={ModalStyle3.modalContainer}>
+                        <Text style={ModalStyle3.title}>{itemselect.TitleNotify?.toString()}</Text>
+
+                        <View style={ModalStyle3.row}>
+                            <Text style={ModalStyle3.label}>Nội dung:</Text>
+                            <Text style={ModalStyle3.value}>{itemselect.MsgNotify?.toString()}</Text>
+                        </View>
+
+                        <View style={ModalStyle3.row}>
+                            <Text style={ModalStyle3.label}>Thời gian:</Text>
+                            <Text style={ModalStyle3.value}>{clsFunc.fFormatDataItem('EventsDate',itemselect)}</Text>
+                        </View>
+
+                        <View style={ModalStyle3.row}>
+                            <Text style={ModalStyle3.label}>Người thực hiện:</Text>
+                            <Text style={ModalStyle3.value}>{itemselect.UserID?.toString()}</Text>
+                        </View>
+
+                        <View style={ModalStyle3.row}>
+                            <Text style={ModalStyle3.label}>Máy tính:</Text>
+                            <Text style={ModalStyle3.value}>{itemselect.ComputerName?.toString()}</Text>
+                        </View>
+
+                        <TouchableOpacity style={ModalStyle3.closeButton} onPress={()=>{
+                            fHandleFilterChange(key,'');
+                            clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,false);
+                        }}>
+                        <Text style={ModalStyle3.closeButtonText}>Đóng</Text>
+                        </TouchableOpacity>
                     </View>
-                  </ScrollView>
-                </View>
-            </SafeAreaView>
-        </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
-  );
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
+        );
+    };
+    
+
+    //#endregion
+    
+    return (
+        <TouchableWithoutFeedback onPress={()=>{ Keyboard.dismiss()}} accessible={false}>
+            <KeyboardAvoidingView  style={{ flex: 1, backgroundColor: 'white' }}>
+                <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}> 
+                    
+                    <ComponentHeader />
+
+                    <View style={{ flex: filteredData.length>0?1:null}}>
+                    <ScrollView
+                        horizontal
+                        keyboardShouldPersistTaps="handled"
+                    >
+                        <View style={{...containerView('report',data)}}>
+                            {/* Header */}
+                            <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
+                                {keys.map(key => (
+                                    <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                ))}
+                            </View>
+        
+                            {/* Filter row */}
+                            <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
+                                {keys.map(key => (
+                                    <TextInput                          
+                                        key={key}
+                                        style={{...GridStyle(visibleKeys.length,key).filterInput}}
+                                        placeholder={''}
+                                        value={filters[key]}
+                                        onChangeText={value => fHandleFilterChange(key, value)}
+                                    />
+                                ))}
+                            </View>
+                
+                            <FlatList
+                                data={filteredData} // luôn data gốc
+                                keyExtractor={(item, index) => index.toString()}
+                                style={{ height: 'auto'}} 
+                                ListEmptyComponent={() => (
+                                    <View style={{flex:1,justifyContent:"center",alignItems:'center'}}>
+                                        <Text style={{textAlign:'center',textAlignVertical:'center',}}>Không có dữ liệu</Text>
+                                    </View>
+                                )}
+                                renderItem={({ item }) => {
+                                    if (!item) return null;                    
+                                    const show = !!item && Object.keys(filters).every(k =>
+                                        (item?.[k] ?? '').toString().toLowerCase().includes((filters[k] ?? '').toLowerCase())
+                                    );
+                                            
+                                    if (!show) return null;
+        
+                                    return (
+                                        <TouchableOpacity 
+                                            style={{...GridStyle(visibleKeys.length,'').dataRow}} 
+                                            onPress={()=>{
+                                                setSelectedItem(item);
+                                                clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,true);
+                                            }}
+                                        >
+                                            {keys.map(key => (
+                                                <Text 
+                                                    key={key} 
+                                                    style={{...GridStyle(visibleKeys.length,key).dataCell}}
+                                                >
+                                                        {clsFunc.fFormatDataItem(key,item)}
+                                                </Text>
+                                            ))}
+                                        </TouchableOpacity>
+                                    );
+                                }}
+                            />
+                                        
+                        </View>
+                    </ScrollView>
+                    </View>
+                    
+                    {visibleLoadData?
+                        <ViewLoadingAnimation 
+                            visibleLoadData={visibleLoadData} />
+                    :null}
+
+                    {modalVisible == true? 
+                        <ModalSelectFields 
+                            modalVisible={modalVisible}
+                                setModalVisible={setModalVisible}
+                                allKeys={allKeys}
+                                selectedKeys={selectedKeys}
+                                setSelectedKeys={setSelectedKeys}
+                                onConfirm={fHandleConfirmSelectFields}
+                        />
+                    :null}
+
+                    {visibleThongBao? 
+                        <ModalDetailThongBao 
+                            visibleThongBao={visibleThongBao}
+                            setvisibleThongBao={setvisibleThongBao}
+                            //itemselect={item!=null?selectedItem[0]:selectedItem}
+                            itemselect={selectedItem[0]?selectedItem[0]:selectedItem}
+                        />
+                    :null}
+
+                    {modalthongbao==true? FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,''):null}
+
+                </SafeAreaView>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+    );
 };
 
 export default Notification;
