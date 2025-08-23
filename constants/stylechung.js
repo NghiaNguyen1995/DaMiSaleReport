@@ -815,11 +815,11 @@ export const GridStyle = (totalColumn,key) => ({
     //#region Function set TextAlign, WidthRowFlatListitem dựa vào key
     export function fSetTextAlignForText(key){
         ["TitleNotify","MsgNotify","EventsDate","Action","ModifiedObjID","ModifiedType","UserID","ComputerName"]
-        if((key.includes('Name')&&!key.includes('UnitName'))||key.includes('VoucherNo')||key.includes('NoteDetails')||key.includes('MsgNotify')){
+        if((key.includes('Name')&&!key.includes('Unit'))||key.includes('VoucherNo')||key.includes('NoteDetails')||key.includes('MsgNotify')
+            || key.includes('ModifiedObjID') || key.includes('ModifiedType')){
             return 'left';
         }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('Date')
-            ||key.includes('UnitName')||key.includes('TitleNotify')||key.includes('Action')
-            || key.includes('ModifiedObjID') || key.includes('ModifiedType')){
+            ||key.includes('Unit')||key.includes('TitleNotify')||key.includes('Action')){
             return 'center';
         }
         else{
@@ -836,13 +836,13 @@ export const GridStyle = (totalColumn,key) => ({
         medium: 0.25,  // ~25% cho ngày, số chứng từ
         default: 0.30, // ~30% cho các cột dữ liệu số
     };
-//ModifiedObjID,ModifiedType    
+    //ModifiedObjID,ModifiedType    
     if (totalColumn >= 4) {
-        if ((key.includes('Name') && !key.includes('UnitName')) || key.includes('NoteDetails')) 
+        if ((key.includes('Name') && !key.includes('Unit')) || key.includes('NoteDetails')) 
         {
         return Math.floor(windowWidth * ratio.large);
         } else if ( (key.includes('ID') && !key.includes('ModifiedObjID') && !key.includes('UserID') &&!key.includes('RowUniqueID'))
-            || key.includes('UnitName')  || key.includes('RowNumber')) 
+            || key.includes('Unit')  || key.includes('RowNumber')) 
         {
         return Math.floor(windowWidth * ratio.small);
         } else if (key.includes('Date') || key.includes('VoucherNo') || key.includes('RowUniqueID')
@@ -866,16 +866,3 @@ export const GridStyle = (totalColumn,key) => ({
     //#endregion
 
 //#endregion
-
-
-/*
-ItemID: "Mã hàng", ItemName: "Tên hàng", UnitName: "ĐVT", WareHouseID: "Kho", BegInvQuantity: "Tồn đầu (kg)", BegInvQuantity2: "Tồn đầu (cây)", InQuantity: "Nhập (kg)",
-InQuantity2: "Nhập (cây)", OutQuantity: "Xuất (kg)", OutQuantity2: "Xuất (cây)", EndInvQuantity: "Tồn cuối (kg)", EndInvQuantity2: "Tồn cuối (cây)", AccountID: "Mã TK",
-CustomerName: "Tên\nkhách hàng", TradeName: "Tên\nkhách hàng", TaxCode: "Mã số thuế", CnvBegDebit: "Phải thu\nđầu kỳ", CnvBegCredit: "Phải trả\nđầu kỳ", 
-CnvDebit: "Phải thu\ntrong kỳ", CnvCredit: "Phải trả\ntrong kỳ", CnvEndDebit: "Phải thu\ncuối kỳ",  CnvEndCredit: "Phải trả\ncuối kỳ", RowNumber: "STT", VoucherDate: "Ngày",
-VoucherNo: "Số phiếu", Description: "Diễn giải", InvoiceNo: "Số\nhóa đơn", InvoiceDate: "Ngày\nhóa đơn", SerialNo: "Số serial", PaymentMethodName: "Phương thức\nthanh toán",
-CustomerID: "Mã\nkhách hàng", Address1: "Địa chỉ", ItemColor: "Màu sắc", Specification: "Quy cách", Quantity: "Số lượng", Quantity2: "Số lượng phụ", QtyCay: "Số cây",
-QtyMet: "Số mét", ConvertPrice: "Đơn giá", ConvertPrice2: "Đơn giá quy đổi phụ", CnvPriceCay: "Đơn giá theo cây", CnvPriceMet: "Đơn giá theo mét", ConvertAmount: "Thành tiền",
-NoteDetails: "Ghi chú", PrepairedByName: "Người bán", Transactor: "Người giao dịch", TranAddress: "Địa chỉ giao dịch", AttachDocInfo: "Thông tin tài liệu đính kèm",
-Notes: "Ghi chú", SalesManID: "Mã NV", SalesManName: "Tên NV", ItemGroupID: "Mã\nnhóm hàng",
-*/

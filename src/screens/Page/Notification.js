@@ -9,7 +9,7 @@ import { NameScreen } from '../../../constants/NameScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, icons } from '../../../constants';
 import { clsFunc } from '../Function/Chung/fSupport';
-import { GetNotification } from '../../api/SalesManager';
+import { GetNotification, SalesManagerAPI } from '../../api/SalesManager';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 
@@ -47,12 +47,6 @@ export const Notification = ({navigation,route}) => {
     const [selectedKeys, setSelectedKeys] = useState(visibleKeys); // mặc định bằng visibleKeys khi mở
   
     let allKeys = Object.keys(data[0] || {});
-  
-    // Mở modal thì set selectedKeys hiện tại
-    function fOpenSelectModal() {
-        setSelectedKeys(visibleKeys);
-        setModalVisible(true);
-    }
   
     //Hàm xử lý khi user xác nhận chọn thêm fields
     function fHandleConfirmSelectFields(newSelectedKeys) {
@@ -152,8 +146,8 @@ export const Notification = ({navigation,route}) => {
     }, [route.params?.dt]);
 
     useEffect(() => {
-        if (item && data.length > 0) {
-                fSetDataFromNotification(key, item);
+        if (item && data.length > 0){
+            fSetDataFromNotification(key, item);
         }
     }, [item, data]);
     //#endregion
@@ -193,18 +187,18 @@ export const Notification = ({navigation,route}) => {
     //#region Get danh sách thông báo
     async function fLoadNotifications() {
         try {
-        await GetNotification(setvisibleLoadData).then((data)=>{
-            if(data.status==200 && data.data?.ObjectData?.length > 0){
-                setData(data.data.ObjectData)
-                setFilteredData(data.data.ObjectData);
-                console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData)
-            }else{
-                console.log('Status thông báo trả về: ',data.status);
-                console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData);
-            }
-        })
+            await SalesManagerAPI.GetNotification(setvisibleLoadData).then((data)=>{
+                if(data.status==200 && data.data?.ObjectData?.length > 0){
+                    setData(data.data.ObjectData)
+                    setFilteredData(data.data.ObjectData);
+                    console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData)
+                }else{
+                    console.log('Status thông báo trả về: ',data.status);
+                    console.log('Danh sách thông báo backend trả về: ',data.data.ObjectData);
+                }
+            })
         } catch (error) {
-        console.error('Lỗi khi đọc notification từ AsyncStorage', error);
+            console.error('Lỗi ', error);
         }
     };
     //#endregion
@@ -275,7 +269,6 @@ export const Notification = ({navigation,route}) => {
                     
         
                 <TouchableOpacity 
-                    //onPress={fOpenSelectModal}
                     onPress={()=>{
                         setloaithongbao('NoDetail');
                         setmodalthongbao(true);
@@ -341,8 +334,6 @@ export const Notification = ({navigation,route}) => {
             </Modal>
         );
     };
-    
-
     //#endregion
     
     return (

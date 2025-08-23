@@ -3,20 +3,18 @@ import { Platform } from 'react-native';
 
 export class clsFunc {
 
-    // Format dữ liệu từng dòng
+    // Format dữ liệu từng item
     static fFormatDataItem(key, item) {
       if (key.includes('Quantity') || key.includes('Debit') || key.includes('Credit') || key.includes('ConvertPrice') || key.includes('ConvertAmount')) {
         return item[key] != 0 && item[key] != '' && item[key] != null ? clsFunc.fFormatNumberVN(item[key].toString()) : '';
-      }else if (key.includes('Date') && !key.includes('EventsDate')) {
+       }else if (key.includes('Date') && !key.includes('EventsDate')) {
         return item[key] != '' && item[key] != null ? moment(item[key],"DD/MM/YYYY").format("DD/MM/YYYY") : '';
       }else if(key.includes('EventsDate')){
         return item[key] != '' && item[key] != null ? moment(item[key]).format("DD/MM/YYYY HH:mm:SS") : '';
       }else if(key.includes('ModifiedObjID')){
-        return this.fRenameModifiedObjID(item[key].toString());
-      }else if(key.includes('Action')){
-        return this.fRenameAction(item[key].toString());
+        return this.fRenameModifiedObj(item[key]);
       }else if(key.includes('ModifiedType')){
-        return this.fRenameModifiedType(item[key].toString());
+        return this.fRenameModifiedType(item[key]);
       }else if(key.includes('MsgNotify')){
         return item[key].slice(0,40) +' ...';
       }else{ 
@@ -75,14 +73,22 @@ export class clsFunc {
         UnitName: "ĐVT",
         UnitNameForVoucher:"ĐVT",
         WareHouseID: "Kho",
+        
         BegInvQuantity: "Tồn đầu (kg)",
         BegInvQuantity2: "Tồn đầu (cây)",
+        BegInvValue:  "Giá trị\ntồn đầu",
+       
         InQuantity: "Nhập (kg)",
         InQuantity2: "Nhập (cây)",
+        InValue: "Giá trị nhập",
+    
         OutQuantity: "Xuất (kg)",
         OutQuantity2: "Xuất (cây)",
+        OutValue: "Giá trị xuất",
+        
         EndInvQuantity: "Tồn cuối (kg)",
         EndInvQuantity2: "Tồn cuối (cây)",
+        EndInvValue: "Giá trị\ntồn cuối",
         //Báo cáo công nợ
         AccountID: "Mã TK",
         CustomerName: "Tên\nkhách hàng",
@@ -142,7 +148,9 @@ export class clsFunc {
         //Doanh thu lãi gộp
         CnvAmount511:"Doanh thu",
         CnvAmount632:"Giá vốn",
-        CnvGrossProfit:"Lãi gộp"
+        CnvGrossProfit:"Lãi gộp",
+        InvUnitOfMeasr: "ĐVT\ntồn kho",
+        SellUnitOfMeasr: "ĐVT\nbán hàng"
 
       };
       return mapping[key] || key;
@@ -257,63 +265,69 @@ export class clsFunc {
         if (!item || !(key in item)) {
           return null; 
         }
+        // Giành cho color Backgroup Item
         if(TypeSet==='background'){
           switch(item[key]){
             case '1':
-              return '#F08080'
+              return '#b65656ff'
             case '2':
-              return '#6495ED'
-            case '3':
-              return '#FF99FF'
+              return '#9c12126e'
             case '4': 
               return '#CD853F'
+            case '8':
+              return '#c4b707af'
             default:
               return null
           }
-        }else{
-          switch(item[key]){
-            case '1':
-              return 'white'
-            case '2':
-              return 'white'
-            case '3':
-              return 'white'
-            case '4': 
-              return 'white'
-            default:
-              return null
+        }else{ 
+          // Giành color TextItem
+          if(item[key]=="1"||item[key]=="2"||item[key]=="4"||item[key]=="8"){
+            return 'white'
+          }else{
+            return null
           }
+         
         }
-      
+    }
+
+    static fSetFontWeightForItem(key,item){
+      if (!item || !(key in item)) {
+          return null; 
+        }
+      if(item[key]=="1"||item[key]=="2"||item[key]=="4"||item[key]=="8"){
+        return 'bold'
+      }
+      else{
+          return null
+      }
+        
+    }
+
+    // Đặt tên tiếng việt cho các trường của ModifiedObjID
+    static fRenameModifiedObj(key){
+      switch(key){
+        case '1':
+          return 'Số lượng thay đổi (sửa số lượng)'
+        case '2':
+          return 'Đơn giá bán thay đổi (sửa Giá bán)'
+        case '4':
+          return 'Số lượng và Đơn giá bán thay đổi\n(sửa số lượng và đơn giá)'
+        default: 
+          return ''
+      }
     }
 
     // Đặt tên tiếng việt cho các trường của ModifiedType
     static fRenameModifiedType(key){
       switch(key){
         case '1':
-          return 'Số lượng vật tư thay đổi'
+          return 'Thay đổi Bảng giá bán'
         case '2':
-          return 'Đơn giá vật tư thay đổi'
-        case '3':
-          return 'Sửa giá bán vật tư trong danh mục'
+          return 'Lập phiếu mới: Giá bán khác với Bảng giá bán chuẩn'
         case '4':
-          return 'Giá bán khác với giá trong danh mục'
-        default: 
-          return ''
-      }
-    }
-
-    // Đặt tên tiếng việt cho các trường của ModifiedObjID
-    static fRenameModifiedObjID(key){
-      switch(key){
-        case '1':
-          return 'Phiếu nhập kho'
-        case '2':
-          return 'Phiếu bán hàng'
-        case '3':
-          return 'Phiếu xuất kho'
-        case '4':
-          return 'Phiếu trả kho'
+          return 'Sửa phiếu bán hàng: Sửa số lượng hoặc đơn giá của Mặt hàng đã lập'
+        case '8':
+          return 'Sửa phiếu bán hàng: thêm Mặt hàng mới: có giá bán khác với Bảng giá bán chuẩn'
         default: 
           return ''
       }
@@ -335,15 +349,5 @@ export class clsFunc {
           return ''
       }
     }
-
-    static fGetNameProceducer(id) {
-      const sNameTable = [
-        { id: "doanhthulaigop", name: "SL_spRptGeneralGrossProfitByItem" },
-        { id: "doanhthubanhang", name: "SL_spRptGeneralSalesByDate" }
-      ];
-
-      const found = sNameTable.find(data => data.id === id);
-      return found ? found.name : null; // trả null nếu không tìm thấy
-    }
-
+    
 }

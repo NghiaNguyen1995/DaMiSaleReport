@@ -21,7 +21,7 @@ import { NameScreen } from '../../../constants/NameScreen';
 import { buttonStyle, containerInput, ModalStyle } from '../../../constants/stylechung';
 import { _getAllMyAppFilesList_FolderShare, _getAllMyAppFilesList_myFolder } from '../../Function/GoogleDrive/GetListFileGGDrive';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetLogin, ResetPassword } from '../../api/SalesManager';
+import { SalesManagerAPI } from '../../api/SalesManager';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { pick, types } from '@react-native-documents/picker';
 import { Modal } from 'react-native-paper';
@@ -272,7 +272,7 @@ export default function Login({ navigation }) {
 
         async function fGetLoginAPI() {
 
-          await GetLogin(manv,pw,setvisileLoad).then((data)=>{
+          await SalesManagerAPI.GetLogin(manv,pw,setvisileLoad).then((data)=>{
             console.log('Data trả về sau đăng nhập: ',data.data.ObjectData);
             if (data.status == 200) {
                 let user = data.data.ObjectData;
@@ -460,7 +460,7 @@ export default function Login({ navigation }) {
                       'oldPassword':msPass,
                       'newPassword':msPassNew
                 }
-                await ResetPassword(data).then((data)=>{
+                await SalesManagerAPI.ResetPassword(data).then((data)=>{
                   if(data.status==200){
                     setloaithongbao('UpdatePasswordSuccess');
                     clsFunc.fSetTimeToOpenModalThongBao(setmViewDoiMatKhau,false);

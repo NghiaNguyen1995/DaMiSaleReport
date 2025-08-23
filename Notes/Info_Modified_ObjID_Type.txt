@@ -1,0 +1,15 @@
+    '/// Đối tượng thay đổi
+    Friend Enum ModifiedObjIDEnum
+        QuantityModified = 1            '/// Số lượng thay đổi (sửa số lượng)
+        PriceModified = 2               '/// Đơn giá bán thay đổi (sửa Giá bán) 
+        QuantityAndPriceModified = 4    '/// Cả Số lượng + Đơn giá bán thay đổi (sửa số lượng và đơn giá)
+    End Enum
+
+    '/// Kiểu thay đổi
+    Friend Enum ModifiedTypeEnum
+        ReSetupPrice = 1                '/// Thay đổi Bảng giá bán
+        SalesPriceDiff = 2              '/// Lập phiếu mới: Giá bán khác với Bảng giá bán chuẩn
+        ReEditItemOfVoucher = 4         '/// Sửa phiếu bán hàng: Sửa số lượng hoặc đơn giá của Mặt hàng đã lập
+        ReNewItemOfVoucher = 8          '/// Sửa phiếu bán hàng: thêm Mặt hàng mới: có giá bán khác với Bảng giá bán chuẩn
+    End Enum
+   

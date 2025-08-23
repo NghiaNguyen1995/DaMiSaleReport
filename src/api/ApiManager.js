@@ -4,15 +4,15 @@ import { Alert } from 'react-native';
 let burl = 'http://simsoft.com.vn:8082/api/SalesManager/';
 
 export const setBaseURL = (url) => {
-
   burl = url;
-  //  Khi đổi URL động thì cần tạo lại instance mới sau khi đổi
+  // Khi đổi URL động thì cần tạo lại instance mới sau khi đổi
   DAMI_API = axios.create({
     baseURL: burl,
     responseType: 'json',
     withCredentials: true,
     timeout:10000
   });
+
   // Gắn lại interceptor mỗi lần tạo mới
   DAMI_API.interceptors.response.use(
     response => response,

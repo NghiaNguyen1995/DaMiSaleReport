@@ -12,7 +12,7 @@ import { containerHeader, containerInput, containerView, GridStyle, ModalLich} f
 import { NameScreen } from '../../../constants/NameScreen';
 import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetChartAccount, GetCustomerBalancebyDate, GetEndCustBalancebyDate, GetEndInvBalanceByDate, GetInventoryBalanceByDate, GetWareHouseList } from '../../api/SalesManager';
+import { GetChartAccount, GetCustomerBalancebyDate, GetEndCustBalancebyDate, GetEndInvBalanceByDate, GetInventoryBalanceByDate, GetWareHouseList, SalesManagerAPI } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import Orientation from 'react-native-orientation-locker';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
@@ -60,8 +60,7 @@ export default function Report({navigation,route}) {
 
     //#region Chức năng xem thêm thông tin
     // Lấy các trường chính để View 
-
-    const defaultKeysKhoDayDu = [/*"ItemID", */"ItemName", "UnitName", "WareHouseID", "BegInvQuantity", "BegInvQuantity2", "InQuantity", "InQuantity2", "OutQuantity", 'OutQuantity2', 'EndInvQuantity','EndInvQuantity2' ];
+    const defaultKeysKhoDayDu = ["ItemName", "UnitName", "WareHouseID", "BegInvQuantity", "BegInvQuantity2","BegInvValue", "InQuantity", "InQuantity2", "InValue", "OutQuantity", 'OutQuantity2', "OutValue", "EndInvQuantity","EndInvQuantity2","EndInvValue"];
     const defaultKeysKhoRutGon = ["ItemName", "WareHouseID", "EndInvQuantity", "EndInvQuantity2"];
 
     const defaultKeysCongnoDayDu = ["AccountID", "TradeName", "CnvBegDebit", "CnvBegCredit","CnvDebit","CnvCredit","CnvEndDebit","CnvEndCredit"]; 
@@ -136,7 +135,7 @@ export default function Report({navigation,route}) {
 
         return (
             <Modal visible={modalVisible} animationType="fade" transparent={true}>
-                <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                {/*<TouchableWithoutFeedback onPress={() => setModalVisible(false)}>*/}
                     <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
                         <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM</Text>
@@ -187,7 +186,7 @@ export default function Report({navigation,route}) {
                         </View>
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
+                {/*</TouchableWithoutFeedback>*/}
             </Modal>
            
         );
@@ -472,13 +471,13 @@ export default function Report({navigation,route}) {
     "Chức năng lấy API List và gắn vô Data"
     async function fLoadDataToDropBox(){
         if(route.params?.id=="baocaotonkho"){
-            await GetWareHouseList().then((data)=>{
+            await SalesManagerAPI.GetWareHouseList().then((data)=>{
                 if(data.status==200 && data.data?.ObjectData?.length > 0){
                     clsFunc.fLoadDataToCombobox(data.data.ObjectData,setitemKho)
                 }
             })
         }else{
-            await GetChartAccount().then((data)=>{
+            await SalesManagerAPI.GetChartAccount().then((data)=>{
                 if(data.status==200 && data.data?.ObjectData?.length > 0){
                     clsFunc.fLoadDataToCombobox(data.data.ObjectData,setitem)
                 }
@@ -488,7 +487,7 @@ export default function Report({navigation,route}) {
  
     "Hàm lấy dữ liệu Báo cáo Tồn kho đầy đủ"
     async function fGetInventoryBalanceByDate(vTaikhoan,vKho,std,td) {
-        await GetInventoryBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetInventoryBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
              if(data.status==200){
                 console.log("Get Báo cáo Tồn kho đầy đủ",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -498,15 +497,16 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
                 }
-                setvisibleLoadData(false);
             }
         })
     }
 
     "Hàm lấy dữ liệu Báo cáo Tồn kho đến ngày (dạng rút gọn)"
     async function fGetEndInvBalanceByDate(vTaikhoan,vKho,std,td) {
-        await GetEndInvBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetEndInvBalanceByDate(vTaikhoan,vKho,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log('Get Báo cáo Tồn kho (dạng rút gọn): ',data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -516,15 +516,16 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
                 }
-                setvisibleLoadData(false)
             }
         })
     }
 
     "Hàm lấy dữ liệu Báo cáo Công nợ (dạng đầy đủ)"
     async function fGetCustomerBalancebyDate(vTaikhoan,std,td) {
-        await GetCustomerBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetCustomerBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log("Get Báo cáo công nợ đầy đủ",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -534,16 +535,16 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
                 }
-               
-                setvisibleLoadData(false);
             }  
         })
     }
 
     "Hàm lấy dữ liệu Báo cáo Công nợ đến ngày (dạng rút gọn)"
     async function fGetEndCustBalancebyDate(vTaikhoan,std,td){
-        await GetEndCustBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetEndCustBalancebyDate(vTaikhoan,std,td,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 console.log("Get Báo cáo công nợ rút gọn",data.data.ObjectData);
                 if(data.data.ObjectData.length > 0) {
@@ -553,8 +554,9 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
                 }
-                setvisibleLoadData(false);
             }
         })
     }
@@ -829,7 +831,7 @@ export default function Report({navigation,route}) {
                             </ScrollView>
                     </View>
 
-                    {modalVisible == true? 
+                    {modalVisible? 
                         <ModalSelectFields 
                             modalVisible={modalVisible}
                             setModalVisible={setModalVisible}
@@ -840,17 +842,21 @@ export default function Report({navigation,route}) {
                         />
                     :null}
 
-                    {openViewCalendar == true ? 
+                    {openViewCalendar? 
                         <ViewCalendar 
                             openViewCalendar={openViewCalendar}
                             setopenViewCalendar={setopenViewCalendar}
                         />
                         :null}
-                    {modalthongbao==true?FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData):null}
-                    {visibleLoadData==true?
+
+                    {modalthongbao?
+                        FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData)
+                        :null}
+
+                    {visibleLoadData?
                         <ViewLoadingAnimation 
                             visibleLoadData={visibleLoadData} />
-                    :null}
+                        :null}
 
                 </SafeAreaView>
             </KeyboardAvoidingView>

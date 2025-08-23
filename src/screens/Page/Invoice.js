@@ -1,6 +1,6 @@
 import React, { useState,useEffect} from 'react'
-import { StyleSheet, Text, View,Dimensions,TouchableWithoutFeedback, KeyboardAvoidingView,Keyboard,TouchableOpacity,
-    Modal, FlatList,ScrollView,TextInput, Image , InteractionManager} from 'react-native'
+import { StyleSheet, Text, View,TouchableWithoutFeedback, KeyboardAvoidingView,Keyboard,TouchableOpacity,
+    Modal, FlatList,ScrollView,TextInput, Image } from 'react-native'
 
 // Import từ các thư viện
 import moment from 'moment/moment';
@@ -13,19 +13,13 @@ import { containerHeader, containerInput, containerView, GridStyle, ModalLich, M
 import { NameScreen } from '../../../constants/NameScreen';
 import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GetEmployeeList, GetSalesVoucher, GetSalesRevenueByProc, GetGeneralSalesByDate } from '../../api/SalesManager';
+import { SalesManagerAPI } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
 
-//const windowWidth = Dimensions.get('window').width;
-//const windowHeight = Dimensions.get('window').height;
-
 export default function Invoice({navigation,route}) {
     
-    //let sNameProducer = clsFunc.fGetNameProceducer(route.params.id)
-    //console.log('sNameProducer: ',sNameProducer)
-
     const [titleHeaderComponent,settitleHeaderComponent] = useState([])
 
     // Dữ liệu cho ngày voucher khi chọn voucher
@@ -66,11 +60,10 @@ export default function Invoice({navigation,route}) {
 
     //#region Chức năng xem thêm thông tin
     // Lấy các trường chính để View 
-    
     let phieubanhang = [
         "RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", 
         "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", 
-        "SalesManName", "CreatedDate", "ModifiedObjID", "Notes"
+        "SalesManName", "CreatedDate", "ModifiedObjID","ModifiedType", "Notes"
     ];
 
     let phieubanhangRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
@@ -126,7 +119,7 @@ export default function Invoice({navigation,route}) {
     
             return (
                 <Modal visible={modalVisible} animationType="fade" transparent={true}>
-                    <TouchableWithoutFeedback onPress={()=>{setModalVisible(false)}}>
+                    {/*<TouchableWithoutFeedback onPress={()=>{setModalVisible(false)}}>*/}
                         <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
                             <View style={{backgroundColor: 'white', padding: 20, width: '80%', borderRadius: 10}}>
                             <Text style={{fontWeight: 'bold', marginBottom: 10}}>CHỌN CÁC THÔNG TIN MUỐN XEM</Text>
@@ -177,11 +170,10 @@ export default function Invoice({navigation,route}) {
                             </View>
                             </View>
                         </View>
-                    </TouchableWithoutFeedback>
+                    {/*</TouchableWithoutFeedback>*/}
                 </Modal>
             );
     };
-
     //#endregion
 
     useEffect(()=>{
@@ -328,6 +320,7 @@ export default function Invoice({navigation,route}) {
         );
     }
 
+    //View Input Doanh thu bán hàng và Doanh thu lãi gộp
     const ComponentInputquanlydoanhthu = () => {
         
         const [oStaff, setoStaff] = useState(null);
@@ -421,7 +414,6 @@ export default function Invoice({navigation,route}) {
         );
 
     }
-
     //#endregion
 
     //#region View Dropbox 
@@ -604,12 +596,11 @@ export default function Invoice({navigation,route}) {
     //#region Function Load API From BackEnd
     "Chức năng lấy API List và gắn vô Data"
     async function fLoadDataToDropBox(){
-        await GetEmployeeList().then((data)=>{
+        await SalesManagerAPI.GetEmployeeList().then((data)=>{
             if(data.status==200 && data.data?.ObjectData?.length > 0){
                 clsFunc.fLoadDataToCombobox(data.data.ObjectData,setiStaff)
             }
-        })
-           
+        })     
     }
 
     "Hàm nạp dữ liệu khi người dùng nhấn nút"
@@ -624,7 +615,7 @@ export default function Invoice({navigation,route}) {
             case 'doanhthubanhang':
                 return fGetGeneralSalesByDate();
             case 'doanhthulaigop':
-                return fGetSalesRevenueByProc();
+                return fGetGeneralGrossProfitByItem();
             default:
                 return null; 
         }
@@ -638,33 +629,24 @@ export default function Invoice({navigation,route}) {
 
         setvisibleLoadData(true);
         
-        await GetSalesVoucher(dayVoucher,voucher,custumer,vS,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetSalesVoucher(dayVoucher,voucher,custumer,vS,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 let dt = data.data.ObjectData
                 console.log("Get dữ liệu hóa đơn",dt);
-                
                 if(dt.length > 0) {
-                    /*let newData = dt.map((item, index) => ({
-                        ...item,
-                        TypeChanged: (index % 7), // Giá trị từ 1 đến 4, lặp lại
-                        ObjIDChanged: clsFunc.fRenameObjIDChanged((index % 7)),
-                    }));
-                    console.log('dt sau khi đổi: ',newData)*/
-
-                    let newData = dt.map((item) => {
-                        return {
-                            ...item,
-                            ModifiedObjID: clsFunc.fRenameModifiedObjID(item.ModifiedObjID)
-                        };
-                    });
-                    setData(newData);
-                    setFilteredData(newData);
+                    setData(dt);
+                    setFilteredData(dt);
                     setTotalRow(data.data.SummaryData);                   
                 }else{
                     setData([]);
                     setFilteredData([]);
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
                 }
-
+            }else{
+                setloaithongbao('WarningNoData');
+                setmodalthongbao(true);
+                console.log('data back end error: ',data)
             }
         })
     }
@@ -684,7 +666,7 @@ export default function Invoice({navigation,route}) {
             return;
         }else{
             setvisibleLoadData(true);
-            await GetGeneralSalesByDate(std,td,vS,'','',setvisibleLoadData).then((data)=>{
+            await SalesManagerAPI.GetGeneralSalesByDate(std,td,vS,'','',setvisibleLoadData).then((data)=>{
                 if(data.status==200){
                     console.log("Get dữ liệu báo cáo doanh thu bán hàng: ",data.data.ObjectData);
                     if(data.data.ObjectData.length > 0) {
@@ -694,15 +676,20 @@ export default function Invoice({navigation,route}) {
                     }else{
                         setData([]);
                         setFilteredData([]);
+                        setloaithongbao('WarningNoData');
+                        setmodalthongbao(true);
                     }
+                }else{
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
+                    console.log('data back end error: ',data)
                 }
             })
         }
     }
 
     "Hàm lấy dữ liệu Báo cáo lãi gộp"
-    async function fGetSalesRevenueByProc(){
-
+    async function fGetGeneralGrossProfitByItem(){
         let std = moment(startDay).format("YYYY-MM-DD");
         let td = moment(toDay).format("YYYY-MM-DD");
         let vS = vStaff != null? vStaff : '';
@@ -715,7 +702,7 @@ export default function Invoice({navigation,route}) {
             return;
         }else{
             setvisibleLoadData(true);
-            await GetSalesRevenueByProc(std,td,vS,'','',setvisibleLoadData).then((data)=>{
+            await SalesManagerAPI.GetGeneralGrossProfitByItem(std,td,vS,'','',setvisibleLoadData).then((data)=>{
                 if(data.status==200){
                     console.log("Get dữ liệu Báo cáo lãi gộp: ",data.data.ObjectData);
                     if(data.data.ObjectData.length > 0) {
@@ -725,7 +712,13 @@ export default function Invoice({navigation,route}) {
                     }else{
                         setData([]);
                         setFilteredData([]);
+                        setloaithongbao('WarningNoData');
+                        setmodalthongbao(true);
                     }
+                }else{
+                    setloaithongbao('WarningNoData');
+                    setmodalthongbao(true);
+                    console.log('data back end error: ',data)
                 }
             })
         }
@@ -751,7 +744,7 @@ export default function Invoice({navigation,route}) {
 
         setvisibleLoadData(true);
 
-        await GetSalesVoucher(vDate,VoucherNo,TradeName,SalesManID,setvisibleLoadData).then((data)=>{
+        await SalesManagerAPI.GetSalesVoucher(vDate,VoucherNo,TradeName,SalesManID,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 if(data.data.ObjectData.length > 0) {
                     setdatadetail(data.data.ObjectData);
@@ -760,11 +753,9 @@ export default function Invoice({navigation,route}) {
                     setVisibleKeys(phieubanhangRutgon)
                     keys=visibleKeys
                     clsFunc.fSetTimeToOpenModalThongBao(setmodalphieubanhang,true);
-                }else{
-                    console.log("data.data.ObjectData: ",data.data.ObjectData)
                 }
             }else{
-                console.log('data back end: ',data)
+                console.log('data back end error: ',data)
             }
         })    
     }
@@ -823,111 +814,116 @@ export default function Invoice({navigation,route}) {
     let keys = visibleKeys;
     //#endregion
 
-    //#region Modal Item phiếu thanh toán
+    //#region Modal detail Item phiếu bán hàng
     const Modalphieubanhang = ({ modalphieubanhang, setmodalphieubanhang, datadetail, itemselect }) => {
 
         return (
             <Modal visible={modalphieubanhang} animationType="slide" transparent={true}>
-                <View style={ModalPhieugiaohang.modalOverlay/*{...ModalNewStyle.modalOverlay}*/}>
-                    <View style={ModalPhieugiaohang.modalContainer/*{...ModalNewStyle.modalContainer}*/}>
-                        <Text style={ModalPhieugiaohang.title}>PHIẾU BÁN HÀNG</Text>
-                        <Text style={ModalPhieugiaohang.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
-                        <Text style={ModalPhieugiaohang.customer}>Khách hàng: {itemselect.TradeName}</Text>
-        
-                        <View style={{ height:'auto',maxHeight:'55%'/*'60%'*/}}>
-                                <ScrollView
-                                    horizontal
-                                    contentContainerStyle={{
-                                        minWidth: keys.length * 100,
-                                    }}
-                                    keyboardShouldPersistTaps="handled"
-                                >
-                                    <View style={{...containerView('report',data),margin:0}}>
-                                        {/* Header */}
-                                        <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
-                                            {keys.map(key => (
-                                                <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
-                                            ))}
-                                        </View>
+                <TouchableWithoutFeedback onPress={()=>{
+                    setVisibleKeys(phieubanhang)
+                    setmodalphieubanhang(false);    
+                }}>
+                    <View style={ModalPhieugiaohang.modalOverlay/*{...ModalNewStyle.modalOverlay}*/}>
+                        <View style={ModalPhieugiaohang.modalContainer/*{...ModalNewStyle.modalContainer}*/}>
+                            <Text style={ModalPhieugiaohang.title}>PHIẾU BÁN HÀNG</Text>
+                            <Text style={ModalPhieugiaohang.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
+                            <Text style={ModalPhieugiaohang.customer}>Khách hàng: {itemselect.TradeName}</Text>
+            
+                            <View style={{ height:'auto',maxHeight:'55%'/*'60%'*/}}>
+                                    <ScrollView
+                                        horizontal
+                                        contentContainerStyle={{
+                                            minWidth: keys.length * 100,
+                                        }}
+                                        keyboardShouldPersistTaps="handled"
+                                    >
+                                        <View style={{...containerView('report',data),margin:0}}>
+                                            {/* Header */}
+                                            <View style={{...GridStyle(visibleKeys.length,'').headerRow}}>
+                                                {keys.map(key => (
+                                                    <Text key={key} style={{...GridStyle(visibleKeys.length,key).headerCell}}>{clsFunc.fRenameHeaderTable(key)}</Text>
+                                                ))}
+                                            </View>
 
-                                        {/* Filter row */}
-                                        <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
-                                            {keys.map(key => (
-                                            <TextInput                          
-                                                key={key}
-                                                style={{...GridStyle(visibleKeys.length,key).filterInput}}
-                                                placeholder={''}
-                                                value={filters[key]}
-                                                onChangeText={value => fHandleFilterChange(key, value)}
-                                            />
-                                            ))}
-                                        </View>
+                                            {/* Filter row */}
+                                            <View style={{...GridStyle(visibleKeys.length,'').filterRow}}>
+                                                {keys.map(key => (
+                                                <TextInput                          
+                                                    key={key}
+                                                    style={{...GridStyle(visibleKeys.length,key).filterInput}}
+                                                    placeholder={''}
+                                                    value={filters[key]}
+                                                    onChangeText={value => fHandleFilterChange(key, value)}
+                                                />
+                                                ))}
+                                            </View>
 
-                                        {/* Data */}
-                                        <FlatList
-                                            data={datadetail} 
-                                            keyExtractor={(item, index) => index.toString()}
-                                            scrollEnabled={true}
-                                            initialNumToRender={20}
-                                            maxToRenderPerBatch={20}
-                                            removeClippedSubviews={true}
-                                            windowSize={10}
-                                            nestedScrollEnabled={true}
-                                            ListEmptyComponent={() => (
-                                                <View style={{flex:1,justifyContent:"center",alignItems:'center'}}>
-                                                    <Text style={{textAlign:'center',textAlignVertical:'center',}}>Không có dữ liệu</Text>
-                                                </View>
-                                            )}
-                                            renderItem={({ item }) => {
+                                            {/* Data */}
+                                            <FlatList
+                                                data={datadetail} 
+                                                keyExtractor={(item, index) => index.toString()}
+                                                scrollEnabled={true}
+                                                initialNumToRender={20}
+                                                maxToRenderPerBatch={20}
+                                                removeClippedSubviews={true}
+                                                windowSize={10}
+                                                nestedScrollEnabled={true}
+                                                ListEmptyComponent={() => (
+                                                    <View style={{flex:1,justifyContent:"center",alignItems:'center'}}>
+                                                        <Text style={{textAlign:'center',textAlignVertical:'center',}}>Không có dữ liệu</Text>
+                                                    </View>
+                                                )}
+                                                renderItem={({ item }) => {
 
-                                                const show = Object.keys(filters).every(k =>
-                                                    item[k]?.toString().toLowerCase().includes(filters[k].toLowerCase())
-                                                );
-                                        
-                                                if (!show) return null;
-                                        
-                                                return (
+                                                    const show = Object.keys(filters).every(k =>
+                                                        item[k]?.toString().toLowerCase().includes(filters[k].toLowerCase())
+                                                    );
+                                            
+                                                    if (!show) return null;
+                                            
+                                                    return (
+                                                        <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
+                                                            {keys.map(key => (
+                                                                    <Text 
+                                                                        key={key} 
+                                                                        style={{...GridStyle(visibleKeys.length,key).dataCell}}
+                                                                        onPress={()=>{}}
+                                                                    >
+                                                                            {item[key]}
+                                                                    </Text>
+                                                                
+                                                            ))}
+                                                        </View>
+                                                    );
+                                                }}
+                                                ListFooterComponent={() =>
+                                                    filteredData.length > 0 ? (
                                                     <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
                                                         {keys.map(key => (
-                                                                <Text 
-                                                                    key={key} 
-                                                                    style={{...GridStyle(visibleKeys.length,key).dataCell}}
-                                                                    onPress={()=>{}}
-                                                                >
-                                                                        {item[key]}
-                                                                </Text>
-                                                            
+                                                            <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
+                                                                {clsFunc.fNameTotalRow(key,totalRowDetail,titleHeaderComponent.id)}
+                                                            </Text>
                                                         ))}
                                                     </View>
-                                                );
-                                            }}
-                                            ListFooterComponent={() =>
-                                                filteredData.length > 0 ? (
-                                                <View style={{...GridStyle(visibleKeys.length,'').dataRow}}>
-                                                    {keys.map(key => (
-                                                        <Text key={key} style={{...GridStyle(visibleKeys.length,key).dataCell,fontWeight:'bold',color:'black'}}>
-                                                            {clsFunc.fNameTotalRow(key,totalRowDetail,titleHeaderComponent.id)}
-                                                        </Text>
-                                                    ))}
-                                                </View>
-                                                ) : null
-                                            }
-                                   
-                                        />   
-                                    </View>
-                                </ScrollView>
+                                                    ) : null
+                                                }
+                                    
+                                            />   
+                                        </View>
+                                    </ScrollView>
+                            </View>
+            
+                            <Text style={ModalPhieugiaohang.total}>Tổng thành tiền: {totalRowDetail.ConvertAmount}</Text>
+                        
+                            <TouchableOpacity onPress={()=>{
+                                setVisibleKeys(phieubanhang)
+                                setmodalphieubanhang(false);    
+                            }} style={ModalPhieugiaohang.closeButton}>
+                                <Text style={ModalPhieugiaohang.closeText}>Đóng</Text>
+                            </TouchableOpacity>
                         </View>
-        
-                        <Text style={ModalPhieugiaohang.total}>Tổng thành tiền: {totalRowDetail.ConvertAmount}</Text>
-                       
-                        <TouchableOpacity onPress={()=>{
-                            setVisibleKeys(phieubanhang)
-                            setmodalphieubanhang(false);    
-                        }} style={ModalPhieugiaohang.closeButton}>
-                            <Text style={ModalPhieugiaohang.closeText}>Đóng</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
+                </TouchableWithoutFeedback>
             </Modal>
         );
     };
@@ -985,9 +981,6 @@ export default function Invoice({navigation,route}) {
                                             </View>
                                         )} 
                                         renderItem={({ item }) => {   
-
-                                            const isNoteNull = item?.Notes !== null ;
-
                                             if (!item) return null;                    
                                             const show = !!item && Object.keys(filters).every(k =>
                                                 (item?.[k] ?? '').toString().toLowerCase().includes((filters[k] ?? '').toLowerCase())
@@ -1008,7 +1001,8 @@ export default function Invoice({navigation,route}) {
                                                             key={key} 
                                                             style={{
                                                                 ...GridStyle(visibleKeys.length,key).dataCell,
-                                                                color: clsFunc.fSetColorForItemSpecial('color',"ModifiedType",item)
+                                                                color: clsFunc.fSetColorForItemSpecial('color',"ModifiedType",item),
+                                                                fontWeight: clsFunc.fSetFontWeightForItem("ModifiedType",item),
                                                             }}
                                                         >
                                                             {clsFunc.fFormatDataItem(key,item)}
@@ -1033,7 +1027,7 @@ export default function Invoice({navigation,route}) {
                             </ScrollView>
                     </View>
                     
-                    {modalVisible == true? 
+                    {modalVisible? 
                         <ModalSelectFields 
                             modalVisible={modalVisible}
                             setModalVisible={setModalVisible}
@@ -1054,12 +1048,16 @@ export default function Invoice({navigation,route}) {
                         />:null
                     }
 
-                    {openViewCalendar ? <ViewCalendar />:null}
-                    {modalthongbao==true? FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData):null}
-                    {visibleLoadData==true?
+                    {openViewCalendar ? 
+                        <ViewCalendar />
+                        :null}
+                    {modalthongbao?
+                        FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData)
+                        :null}
+                    {visibleLoadData?
                         <ViewLoadingAnimation 
                             visibleLoadData={visibleLoadData} />
-                    :null}
+                        :null}
 
                 </SafeAreaView>
             </KeyboardAvoidingView>

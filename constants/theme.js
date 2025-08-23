@@ -1,14 +1,10 @@
 import { Dimensions, StyleSheet } from "react-native";
 const { width, height } = Dimensions.get("window");
 
-const windowWidth = Dimensions.get('window').width;
-
-
-
 export const COLORS = {
     // base colors
-    //primary: "#24C16B", // green
-    secondary: "#0C381F",   // dark green
+    primary: "#24C16B", 
+    secondary: "#187a43ff", 
     blue: "#0000FF",
     lightblue:'#87CEFA',
     green: "#66D59A",
@@ -24,7 +20,6 @@ export const COLORS = {
     black: "#1E1F20",
     white: "#FFFFFF",
     lightGray: '#DCDCDC',
-    //"#DCDCDC",
     gray: "#C1C3C5",
     darkgray: "#76797A",
     transparent: "transparent",
@@ -36,21 +31,16 @@ export const COLORS = {
         title: '#C60000',
         buttonLogin: '#0DA805'
     },
-    //headerColor: '#0DA805', màu xanh lá cây
     tinhtrang:{
-        //daduyet: '#0DA805',
         daduyet: '#66CC00',
-        //choduyet: '#DFD917',
         choduyet: 'black',
         tuchoi: '#EE7942'
     },
-    
     skin1:{
         bgheader: '#04A9B9',
         bgflatlist: '#5AB2BA',
         bgfooter:'#5AB2BA',
     },
-
     skin2:{
         bgheader: '#0FB95B',
         bgflatlist: '#24C16B',
@@ -61,13 +51,10 @@ export const COLORS = {
         bgflatlist: '#0795a3',
         bgfooter:'#24C16B',
     },
-
     chamcong:{
         giovao:'#5834eb',
         giora:'#0795a3'
     }
-
-
 };
 
 export const SIZES = {
@@ -80,7 +67,6 @@ export const SIZES = {
 
     // font sizes
     largeTitle: 50,
-    //h1: 30,
     h1: 25,
     h2: 22,
     h3: 20,
@@ -112,7 +98,6 @@ export const FONTS = {
 
 export const object = StyleSheet.create({
     labelTitle: {
-        //color: COLORS.dialogTitle,
         color: 'white',
         fontSize: SIZES.dialogTitle,    
         font: FONTS.h4,
@@ -120,7 +105,6 @@ export const object = StyleSheet.create({
         
     },
     labelTitle1: {
-        //color: COLORS.dialogTitle,
         color: 'white',
         fontSize: SIZES.dialogTitle,    
         font: FONTS.h4,
@@ -128,16 +112,9 @@ export const object = StyleSheet.create({
         
     },
     labelDSSA: {
-        //color: COLORS.dialogTitle,
         fontSize: SIZES.dialogTitle,    
         font: FONTS.h3,
         textAlign: 'center',
-        
-    },
-    labelTextInput:{
-
-    },
-    labeTextButton: {
         
     },
 

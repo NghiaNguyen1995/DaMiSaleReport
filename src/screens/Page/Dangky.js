@@ -18,8 +18,7 @@ import { GetDevice } from '../Function/Chung/functionInfoDevice';
 import { buttonStyle } from '../../../constants/stylechung';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-const SIGN_IN = 'SIGN_IN'
-const GET_STARTED = 'GET_STARTED'
+
 
 export function Regist({ navigation }) {
 

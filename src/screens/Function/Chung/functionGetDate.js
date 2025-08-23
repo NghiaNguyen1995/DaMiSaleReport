@@ -1,7 +1,6 @@
 export function GetDate(){
-    
         const date = new Date();
-        let day,month,hour,minute
+        let day,month,hour,minute,second
         if(date.getMonth()+1<10){
           month = `0${date.getMonth()+1}`
         }else{
@@ -22,17 +21,19 @@ export function GetDate(){
         }else{
           minute= `${date.getMinutes()}`
         }
+        if(date.getSeconds()<10){
+          second = `0${date.getSeconds()}`
+        }else{
+          second= `${date.getSeconds()}`
+        }
         
-        //const dateString = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
-        
-        let dateString = `${day}-${month}-${date.getFullYear()} ${hour}:${minute}`;
+        let dateString = `${day}-${month}-${date.getFullYear()} ${hour}:${minute}:${second}`;
         return dateString     
 }
 
 export function GetGuidId(){
-    
   const date = new Date();
-  let day,month,hour,minute
+  let day,month,hour,minute,second
   if(date.getMonth()+1<10){
     month = `0${date.getMonth()+1}`
   }else{
@@ -53,10 +54,13 @@ export function GetGuidId(){
   }else{
     minute= `${date.getMinutes()}`
   }
-  
-  //const dateString = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
-  
-  let dateString = `${date.getFullYear()}${month}${day}${hour}${minute}`;
+  if(date.getSeconds()<10){
+    second = `0${date.getSeconds()}`
+  }else{
+    second= `${date.getSeconds()}`
+  }
+
+  let dateString = `${date.getFullYear()}${month}${day}${hour}${minute}${second}`;
   return dateString     
 }
 
@@ -68,6 +72,5 @@ export const SetNgayGio=()=>{
             loaithongke:'thongkengay',
             day: dateString
     }
-    //console.log('Footer trang chủ: ',dataThongKeGioRaVao)
     return dataThongKeGioRaVao  
 }
