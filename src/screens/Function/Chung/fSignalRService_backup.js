@@ -1,10 +1,10 @@
-//import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+/*import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { DaMiHeader } from '../../../api/SetUpDaMi';
 import { clsPushNotification } from './fPushNotificationLocal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class clsSignalRService {
-    /*static connection = null;
+    static connection = null;
 
     static async startConnection() {
         
@@ -63,5 +63,5 @@ export class clsSignalRService {
             }
         }
     }
-    */
-}
+    
+}*/

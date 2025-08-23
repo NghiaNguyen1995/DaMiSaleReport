@@ -7,12 +7,12 @@ import moment from 'moment/moment';
 import CalendarPicker from 'react-native-calendar-picker'
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Import từ các file khác
 import { containerHeader, containerInput, containerView, GridStyle, ModalLich, ModalPhieugiaohang} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
 import { FunctionViewThongBao } from '../Function/Chung/fViewThongBao';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { SalesManagerAPI } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
@@ -1064,47 +1064,3 @@ export default function Invoice({navigation,route}) {
         </TouchableWithoutFeedback>
     )
 }
-
-const style = StyleSheet.create({
-   
-    // Style cho Modal Lịch
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)', // nền mờ
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContainer: {
-        width: '95%',
-        backgroundColor: 'white',
-        borderRadius: 12,
-        overflow: 'hidden',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        paddingBottom: 15,
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: COLORS.skin2.bgfooter,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
-    },
-    headerTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    todayText: {
-        fontSize: 14,
-        color: 'white',
-        textAlign: 'right',
-    },
-
-});
