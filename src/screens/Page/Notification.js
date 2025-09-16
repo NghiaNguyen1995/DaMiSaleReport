@@ -25,7 +25,7 @@ export const Notification = ({navigation,route}) => {
     const [filteredData, setFilteredData] = useState([]);
     const [filters, setFilters] = useState({});
 
-    const [item, setItem] = useState(route.params?.dt);
+    const [item, setItem] = useState(route.params?.rowUniqueID);
 
     //Modal load dữ liệu
     const[visibleLoadData,setvisibleLoadData]=useState(false)
@@ -139,11 +139,11 @@ export const Notification = ({navigation,route}) => {
     
     //#region Xử lý khi thay đổi dữ liệu
     useEffect(() => {
-        if (route.params?.dt) {
+        if (route.params?.rowUniqueID) {
             fInitLoad(); // nếu cần, load lại data
-            setItem(route.params.dt);
+            setItem(route.params.rowUniqueID);
         }
-    }, [route.params?.dt]);
+    }, [route.params?.rowUniqueID]);
 
     useEffect(() => {
         if (item && data.length > 0){

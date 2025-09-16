@@ -51,7 +51,7 @@ export default function Invoice({navigation,route}) {
 
     const [datadetail, setdatadetail] = useState([]);
     const [itemselect,setitemselect]=useState({});
-
+    
     //Modal load dữ liệu
     const[visibleLoadData,setvisibleLoadData]=useState(false)
     
@@ -176,6 +176,7 @@ export default function Invoice({navigation,route}) {
     };
     //#endregion
 
+    //#region // Xử lý khi thay đổi chuyển screen 
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             fInitLoad()
@@ -183,6 +184,17 @@ export default function Invoice({navigation,route}) {
 
         return () => {unsubscribe};
     },[navigation])
+    //#endregion
+    
+    //#region Xử lý khi thay đổi dữ liệu
+    useEffect(() => {
+        if (route.params?.voucherID) {
+            console.log('VoucherID truyền vào: ', route.params?.voucherID);
+            fInitLoad(); // nếu cần, load lại data
+            fGetSalesOneVoucher();
+        }
+    }, [route.params?.voucherID]);
+    //#endregion    
 
     //#region Component của 1 Page 
     const ComponentHeader=()=>{
@@ -758,6 +770,26 @@ export default function Invoice({navigation,route}) {
                 console.log('data back end error: ',data)
             }
         })    
+    }
+
+    "Hàm nạp dữ liệu từ thông báo"
+    async function fGetSalesOneVoucher(){
+        await SalesManagerAPI.GetSalesOneVoucher(route.params?.voucherID).then((data)=>{
+            if(data.status==200){
+                let dt = data.data.ObjectData
+                console.log("Get dữ liệu hóa đơn từ thông báo",dt);
+                if(dt.length > 0) {
+                    setData(dt);
+                    setFilteredData(dt);
+                    setTotalRow(data.data.SummaryData);                   
+                }else{
+                    setData([]);
+                    setFilteredData([]);
+                }
+            }else{
+                console.log('data back end error: ',data)
+            }
+        })
     }
     //#endregion
 

@@ -203,6 +203,24 @@ static ResetPassword = async(data) => {
       }
   }
 
+  // GetSalesVoucher: Phiếu bán hàng
+  static GetSalesOneVoucher = async(VoucherID) => {
+      try {
+        const result = await DAMI_API.get(`GetSalesOneVoucher?vVoucherID=${VoucherID}`, {
+            method: 'GET',
+            headers: {
+              'content-type': 'application/json',
+              'DaMiPartnerGUID': DaMiHeader[0].DaMiPartnerGUID,
+              'DaMiPartnerToken': DaMiHeader[0].DaMiPartnerToken
+            },
+            //data: JSON.stringify(data)
+        });
+        return result;
+      } catch (error) {
+        return handleSearch(error)
+      }
+  }
+
   // GetGeneralSalesByDate: Doanh thu bán hàng theo nhân viên Proceduce SL_spRptGeneralSalesByDate
   static GetGeneralSalesByDate = async(vFromday,vToDay,sSalesManID,sItemGroupID,sWareHouseID,setload) => {
   try {

@@ -19,7 +19,7 @@ export class clsSignalRService {
 
         this.connection = new HubConnectionBuilder()
         .withUrl('http://simsoft.com.vn:8082/notificationHub', {
-        //.withUrl('http://192.168.1.15:5055/notificationHub',{
+        //.withUrl('http://192.168.1.10:5055/notificationHub',{
             //accessTokenFactory: () => 'your_token', // nếu có token
             headers: {
                 'UserID': userID.ID? userID.ID : '',
@@ -31,8 +31,6 @@ export class clsSignalRService {
         .configureLogging(LogLevel.Information)
         .withAutomaticReconnect()
         .build();
-        
-        //let datamessage = JSON.parse(await AsyncStorage.getItem('notification')) || [];
 
         this.connection.on('ReceiveNotification', (message) => {
 

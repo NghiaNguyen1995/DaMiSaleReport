@@ -14,17 +14,29 @@ export class clsPushNotification{
 
                 console.log("Người dùng có nhấn vô thông báo");
 
-                let notifyData = notification.data?.rowUniqueID;
-                console.log('rowUniqueID click: ', notifyData);
-
+                let rowUniqueID = notification.data?.rowUniqueID;
+                let voucherID = notification.data?.voucherID;
+                
+                console.log('rowUniqueID click: ', rowUniqueID);
+                console.log('voucherID click: ', voucherID);
+                
                 // Dùng navigationRef để điều hướng
-                let data={
+                /*let data={
                   id: 'thongbao',
                   description: "THÔNG BÁO",
-                  dt: notifyData,
+                  rowUniqueID: rowUniqueID,
+                  //voucherID: voucherID
                 }
-                 
-                navigation.navigate(NameScreen.Thongbao,data);
+                navigation.navigate(NameScreen.Thongbao,data);*/
+                
+                let data={
+                  id: 'phieubanhang',
+                  description: "PHIẾU\nBÁN HÀNG",
+                  rowUniqueID: rowUniqueID,
+                  voucherID: voucherID
+                }
+
+                navigation.navigate(NameScreen.Phieubanhang,data);
             }
         },
 

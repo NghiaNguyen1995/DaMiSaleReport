@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { Alert } from 'react-native';
 
-let burl = 'http://simsoft.com.vn:8082/api/SalesManager/';
+let burl = 'http://simsoft.com.vn:8082/api/SalesManager/'; //Server Chuẩn
+//let burl = 'http://192.168.1.10:5055/api/SalesManager/'; //Server nội bộ test
 
 export const setBaseURL = (url) => {
   burl = url;
