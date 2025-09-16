@@ -496,10 +496,11 @@ export default function Report({navigation,route}) {
                     setFilteredData(data.data.ObjectData);
                     setTotalRow(data.data.SummaryData);
                 }else{
+                    //setloaithongbao('WarningNoData');
+                    //clsFunc.fSetTimeToOpenModalThongBao(setmodalthongbao,true);
                     setData([]);
                     setFilteredData([]);
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setmodalthongbao(true);
                 }
             }
         })
@@ -517,8 +518,8 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                 }
             }
         })
@@ -536,8 +537,8 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                 }
             }  
         })
@@ -555,8 +556,8 @@ export default function Report({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                 }
             }
         })

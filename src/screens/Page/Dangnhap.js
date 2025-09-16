@@ -63,7 +63,7 @@ export default function Login({ navigation }) {
         const t3 = setTimeout(() => setShowFooter(true), 300);
 
         clsPushNotification.configureNotification({navigation});   
-        //clsSignalRService.startConnection();
+        clsSignalRService.startConnection();
 
         return () => {
           clearTimeout(t1);

@@ -11,9 +11,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "@microsoft/signalr": "^9.0.6",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
-    "@react-native-community/art": "^1.2.0",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-documents/picker": "^10.1.5",
     "@react-native-documents/viewer": "^1.0.1",

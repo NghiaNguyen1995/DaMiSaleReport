@@ -640,12 +640,12 @@ export default function Invoice({navigation,route}) {
                 }else{
                     setData([]);
                     setFilteredData([]);
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                 }
             }else{
-                setloaithongbao('WarningNoData');
-                setmodalthongbao(true);
+                //setloaithongbao('WarningNoData');
+                //setmodalthongbao(true);
                 console.log('data back end error: ',data)
             }
         })
@@ -676,12 +676,12 @@ export default function Invoice({navigation,route}) {
                     }else{
                         setData([]);
                         setFilteredData([]);
-                        setloaithongbao('WarningNoData');
-                        setmodalthongbao(true);
+                        //setloaithongbao('WarningNoData');
+                        //setmodalthongbao(true);
                     }
                 }else{
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                     console.log('data back end error: ',data)
                 }
             })
@@ -712,12 +712,12 @@ export default function Invoice({navigation,route}) {
                     }else{
                         setData([]);
                         setFilteredData([]);
-                        setloaithongbao('WarningNoData');
-                        setmodalthongbao(true);
+                        //setloaithongbao('WarningNoData');
+                        //setmodalthongbao(true);
                     }
                 }else{
-                    setloaithongbao('WarningNoData');
-                    setmodalthongbao(true);
+                    //setloaithongbao('WarningNoData');
+                    //setmodalthongbao(true);
                     console.log('data back end error: ',data)
                 }
             })
