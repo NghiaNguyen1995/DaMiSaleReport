@@ -28,7 +28,8 @@ target 'DaMiSaleReport' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :hermes_enabled => true
   )
 
   setup_permissions([
@@ -48,5 +49,13 @@ target 'DaMiSaleReport' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-  end
+    # ✅ Fix thiếu dSYM cho Hermes khi Archive
+        installer.pods_project.targets.each do |target|
+          if target.name == 'hermes-engine'
+            target.build_configurations.each do |config|
+              config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+          end
+        end
+      end
+    end
 end
