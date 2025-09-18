@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetDevice } from "../src/screens/Function/Chung/functionInfoDevice";
 
 const windowWidth = Dimensions.get('window').width;
+
 //#region Chung
 
 export const HeaderStyle = {
@@ -609,10 +610,10 @@ export const footerthongke =(data)=>{
 }
 //#endregion
 
-//#region  DaMi sử dụng
+//#region DaMi sử dụng
 
 //Bản view Modal đẹp và gọn:
-export const ModalStyle3={
+export const ModalStyleThongbao={
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -642,7 +643,7 @@ export const ModalStyle3={
     row: {
         marginBottom: 14,
         flexDirection:'row',
-        gap:15
+        gap:15,
     },
     label: {
         fontSize: 13,
@@ -654,14 +655,22 @@ export const ModalStyle3={
         fontSize: 13,
         color: 'black',
         width: windowWidth*0.65,
-        
     },
     closeButton: {
+        marginTop: 10,
+        backgroundColor: COLORS.tinhtrang.tuchoi,
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+        width: '40%'
+    },
+    okButton: {
         marginTop: 10,
         backgroundColor: COLORS.skin2.bgheader,
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: 'center',
+        width: '40%'
     },
     closeButtonText: {
         color: '#fff',
@@ -725,6 +734,7 @@ export const ModalPhieugiaohang={
         fontSize: 17,
         fontWeight: 'bold',
     },
+
 }
 
 export const ModalLich={
@@ -756,8 +766,6 @@ export const ModalLich={
         backgroundColor: COLORS.skin2.bgfooter,
         paddingHorizontal: 12,
         paddingVertical: 10,
-        //borderTopLeftRadius: 12,
-        //borderTopRightRadius: 12,
     },
     headerTitle: {
         fontSize: 16,
@@ -773,53 +781,52 @@ export const ModalLich={
 
 //Style cho Grid (FlatList)
 export const GridStyle = (totalColumn,key) => ({
-    //Dòng Header
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent:'center',
-        backgroundColor: '#f0f0f0',
-    },
-    headerCell: {
-        width: fSetWidthRowFlatListItem(totalColumn,key),
-        fontWeight: 'bold',
-        padding: 5,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        textAlign:'center',
-        textAlignVertical:'center'
-    },
-    //Dòng Filter
-    filterRow: {
-        flexDirection: 'row',
-    },
-    filterInput: {
-        width: fSetWidthRowFlatListItem(totalColumn,key),
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 3,
-    },
-    //Dòng Data Item
-    dataRow: {
-        flexDirection: 'row',
-    },
-    dataCell: {
-        width: fSetWidthRowFlatListItem(totalColumn,key),
-        padding: 5,
-        borderWidth: 1,
-        borderColor: '#eee',
-        textAlign: fSetTextAlignForText(key),
-        textAlignVertical:'center',
-    }
+        //Dòng Header
+        headerRow: {
+            flexDirection: 'row',
+            justifyContent:'center',
+            backgroundColor: '#f0f0f0',
+        },
+        headerCell: {
+            width: fSetWidthRowFlatListItem(totalColumn,key),
+            fontWeight: 'bold',
+            padding: 5,
+            borderWidth: 1,
+            borderColor: '#ccc',
+            textAlign:'center',
+            textAlignVertical:'center'
+        },
+        //Dòng Filter
+        filterRow: {
+            flexDirection: 'row',
+        },
+        filterInput: {
+            width: fSetWidthRowFlatListItem(totalColumn,key),
+            borderWidth: 1,
+            borderColor: '#ccc',
+            padding: 3,
+        },
+        //Dòng Data Item
+        dataRow: {
+            flexDirection: 'row',
+        },
+        dataCell: {
+            width: fSetWidthRowFlatListItem(totalColumn,key),
+            padding: 5,
+            borderWidth: 1,
+            borderColor: '#eee',
+            textAlign: fSetTextAlignForText(key),
+            textAlignVertical:'center',
+        }
 });
 
     //#region Function set TextAlign, WidthRowFlatListitem dựa vào key
     export function fSetTextAlignForText(key){
-        ["TitleNotify","MsgNotify","EventsDate","Action","ModifiedObjID","ModifiedType","UserID","ComputerName"]
         if((key.includes('Name')&&!key.includes('Unit'))||key.includes('VoucherNo')||key.includes('NoteDetails')||key.includes('MsgNotify')
-            || key.includes('ModifiedObjID') || key.includes('ModifiedType')){
+                || key.includes('ModifiedObjID') || key.includes('ModifiedType')){
             return 'left';
         }else if(key.includes('ID')||key.includes('RowNumber')||key.includes('Date')
-            ||key.includes('Unit')||key.includes('TitleNotify')||key.includes('Action')){
+                ||key.includes('Unit')||key.includes('TitleNotify')||key.includes('Action')){
             return 'center';
         }
         else{
@@ -828,40 +835,40 @@ export const GridStyle = (totalColumn,key) => ({
     }
 
     export function fSetWidthRowFlatListItem(totalColumn, key) {
-        
-    // Tỷ lệ phần trăm cho từng loại cột (chỉ dùng khi >= 4 cột)
-    const ratio = {
-        large: 0.25,   // ~25% cho cột "tên" hoặc "ghi chú"
-        small: 0.13,   // ~13% cho ID, STT, đơn vị
-        medium: 0.25,  // ~25% cho ngày, số chứng từ
-        default: 0.30, // ~30% cho các cột dữ liệu số
-    };
-    //ModifiedObjID,ModifiedType    
-    if (totalColumn >= 4) {
-        if ((key.includes('Name') && !key.includes('Unit')) || key.includes('NoteDetails')) 
-        {
-        return Math.floor(windowWidth * ratio.large);
-        } else if ( (key.includes('ID') && !key.includes('ModifiedObjID') && !key.includes('UserID') &&!key.includes('RowUniqueID'))
-            || key.includes('Unit')  || key.includes('RowNumber')) 
-        {
-        return Math.floor(windowWidth * ratio.small);
-        } else if (key.includes('Date') || key.includes('VoucherNo') || key.includes('RowUniqueID')
-            || key.includes("TypeChanged") || key.includes('ModifiedObjID') || key.includes('UserID') 
-            || key.includes('TitleNotify') || key.includes('ModifiedType')) 
-        {
-        return Math.floor(windowWidth * ratio.medium);
-        } else {
-        return Math.floor(windowWidth * ratio.default);
+            
+        // Tỷ lệ phần trăm cho từng loại cột (chỉ dùng khi >= 4 cột)
+        const ratio = {
+            large: 0.25,   // ~25% cho cột "tên" hoặc "ghi chú"
+            small: 0.13,   // ~13% cho ID, STT, đơn vị
+            medium: 0.25,  // ~25% cho ngày, số chứng từ
+            default: 0.30, // ~30% cho các cột dữ liệu số
+        };
+        //ModifiedObjID,ModifiedType    
+        if (totalColumn >= 4) {
+            if ((key.includes('Name') && !key.includes('Unit')) || key.includes('NoteDetails')) 
+            {
+            return Math.floor(windowWidth * ratio.large);
+            } else if ( (key.includes('ID') && !key.includes('ModifiedObjID') && !key.includes('UserID') &&!key.includes('RowUniqueID'))
+                || key.includes('Unit')  || key.includes('RowNumber')) 
+            {
+            return Math.floor(windowWidth * ratio.small);
+            } else if (key.includes('Date') || key.includes('VoucherNo') || key.includes('RowUniqueID')
+                || key.includes("TypeChanged") || key.includes('ModifiedObjID') || key.includes('UserID') 
+                || key.includes('TitleNotify') || key.includes('ModifiedType')) 
+            {
+            return Math.floor(windowWidth * ratio.medium);
+            } else {
+            return Math.floor(windowWidth * ratio.default);
+            }
         }
-    }
 
-    // Nếu ít cột (1-3), chia đều
-    if (totalColumn >= 1 && totalColumn <= 3) {
-        return Math.floor((windowWidth * 0.97) / totalColumn);
-    }
+        // Nếu ít cột (1-3), chia đều
+        if (totalColumn >= 1 && totalColumn <= 3) {
+            return Math.floor((windowWidth * 0.97) / totalColumn);
+        }
 
-    // Mặc định
-    return Math.floor((windowWidth * 0.97) / 4);
+        // Mặc định
+        return Math.floor((windowWidth * 0.97) / 4);
     }
     //#endregion
 

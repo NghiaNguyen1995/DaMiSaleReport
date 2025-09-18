@@ -19,9 +19,7 @@ import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
 import fXuatExcel from '../Function/Chung/fExcelExport';
-
-//const windowWidth = Dimensions.get('window').width;
-//const windowHeight = Dimensions.get('window').height;
+import { clsView } from '../Function/Chung/fView';
 
 export default function Report({navigation,route}) {
     
@@ -209,17 +207,19 @@ export default function Report({navigation,route}) {
             <View style={{...containerHeader.ctnHeader,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                 <View style={{flexDirection:'row'}}>    
                     <TouchableOpacity 
-                        onPress={()=>{navigation.navigate(NameScreen.TrangChu,titleHeaderComponent)}} 
+                        onPress={()=>{
+                            navigation.navigate(NameScreen.TrangChu,titleHeaderComponent)
+                        }} 
                         style={{marginRight:10}}>
-                                <Image
-                                    source={icons.trove}
-                                    style={{
-                                        width: 30,
-                                        height: 30,
-                                        tintColor: 'white',
-                                        marginLeft:10    
-                                    }} 
-                                />
+                            <Image
+                                source={icons.trove}
+                                style={{
+                                    width: 30,
+                                    height: 30,
+                                    tintColor: 'white',
+                                    marginLeft:10    
+                                }} 
+                            />
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={async()=>{
@@ -850,7 +850,7 @@ export default function Report({navigation,route}) {
                             setopenViewCalendar={setopenViewCalendar}
                         />
                         :null}
-
+                  
                     {modalthongbao?
                         FunctionViewThongBao(loaithongbao,modalthongbao,setmodalthongbao,actionData)
                         :null}

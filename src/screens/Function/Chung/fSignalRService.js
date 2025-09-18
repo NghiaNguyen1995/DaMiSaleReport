@@ -33,10 +33,8 @@ export class clsSignalRService {
         .build();
 
         this.connection.on('ReceiveNotification', (message) => {
-
             console.log('message back end: ',message);
             clsPushNotification.showLocalNotification('Thông báo', message); //Thông báo khi trạng thái app online
-        
         });
 
         try {

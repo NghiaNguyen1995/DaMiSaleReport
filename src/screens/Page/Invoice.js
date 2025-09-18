@@ -17,6 +17,7 @@ import { SalesManagerAPI } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
+import { clsView } from '../Function/Chung/fView';
 
 export default function Invoice({navigation,route}) {
     
@@ -51,7 +52,7 @@ export default function Invoice({navigation,route}) {
 
     const [datadetail, setdatadetail] = useState([]);
     const [itemselect,setitemselect]=useState({});
-    
+
     //Modal load dữ liệu
     const[visibleLoadData,setvisibleLoadData]=useState(false)
     
@@ -59,11 +60,11 @@ export default function Invoice({navigation,route}) {
     const [totalRowDetail, settotalRowDetail] = useState({});
 
     //#region Chức năng xem thêm thông tin
-    // Lấy các trường chính để View 
+    // Lấy các trường chính để View
     let phieubanhang = [
         "RowNumber","VoucherDate","VoucherNo", "TradeName","ItemID", "ItemName", 
         "UnitNameForVoucher", "QuantityByVoucher", "CnvPriceByVoucher", "ConvertAmount", 
-        "SalesManName", "CreatedDate", "ModifiedObjID","ModifiedType", "Notes"
+        "SalesManName", "CreatedDate", "Notes"
     ];
 
     let phieubanhangRutgon = ["ItemName","QuantityByVoucher","CnvPriceByVoucher", "ConvertAmount"];
@@ -180,20 +181,24 @@ export default function Invoice({navigation,route}) {
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             fInitLoad()
+            if (route.params?.voucherID) {
+                console.log('VoucherID truyền vào: ', route.params?.voucherID); 
+                fGetSalesOneVoucher();
+            }
         });
-
+        
         return () => {unsubscribe};
     },[navigation])
     //#endregion
     
     //#region Xử lý khi thay đổi dữ liệu
-    useEffect(() => {
+    /*useEffect(() => {
         if (route.params?.voucherID) {
             console.log('VoucherID truyền vào: ', route.params?.voucherID);
             fInitLoad(); // nếu cần, load lại data
             fGetSalesOneVoucher();
         }
-    }, [route.params?.voucherID]);
+    }, [route.params?.voucherID]);*/
     //#endregion    
 
     //#region Component của 1 Page 
@@ -644,7 +649,7 @@ export default function Invoice({navigation,route}) {
         await SalesManagerAPI.GetSalesVoucher(dayVoucher,voucher,custumer,vS,setvisibleLoadData).then((data)=>{
             if(data.status==200){
                 let dt = data.data.ObjectData
-                console.log("Get dữ liệu hóa đơn",dt);
+                console.log("Get dữ liệu hóa đơn từ nhấn nút Nạp dữ liệu",dt);
                 if(dt.length > 0) {
                     setData(dt);
                     setFilteredData(dt);
@@ -777,7 +782,7 @@ export default function Invoice({navigation,route}) {
         await SalesManagerAPI.GetSalesOneVoucher(route.params?.voucherID).then((data)=>{
             if(data.status==200){
                 let dt = data.data.ObjectData
-                console.log("Get dữ liệu hóa đơn từ thông báo",dt);
+                console.log("Get dữ liệu hóa đơn từ thông báo từ biến truyền vào: ",dt);
                 if(dt.length > 0) {
                     setData(dt);
                     setFilteredData(dt);
@@ -848,15 +853,14 @@ export default function Invoice({navigation,route}) {
 
     //#region Modal detail Item phiếu bán hàng
     const Modalphieubanhang = ({ modalphieubanhang, setmodalphieubanhang, datadetail, itemselect }) => {
-
         return (
             <Modal visible={modalphieubanhang} animationType="slide" transparent={true}>
                 <TouchableWithoutFeedback onPress={()=>{
                     setVisibleKeys(phieubanhang)
                     setmodalphieubanhang(false);    
                 }}>
-                    <View style={ModalPhieugiaohang.modalOverlay/*{...ModalNewStyle.modalOverlay}*/}>
-                        <View style={ModalPhieugiaohang.modalContainer/*{...ModalNewStyle.modalContainer}*/}>
+                    <View style={ModalPhieugiaohang.modalOverlay}>
+                        <View style={ModalPhieugiaohang.modalContainer}>
                             <Text style={ModalPhieugiaohang.title}>PHIẾU BÁN HÀNG</Text>
                             <Text style={ModalPhieugiaohang.subTitle}>NV: {itemselect.SalesManName} - Ngày: {moment(itemselect.VoucherDate,"DD/MM/YYYY").format("DD/MM/YYYY")}</Text>
                             <Text style={ModalPhieugiaohang.customer}>Khách hàng: {itemselect.TradeName}</Text>

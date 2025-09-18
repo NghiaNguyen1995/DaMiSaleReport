@@ -4,7 +4,7 @@ import { Text, View,TouchableWithoutFeedback, KeyboardAvoidingView,Keyboard,Touc
      Dimensions} from 'react-native'
 
 // Import từ các file khác
-import { containerHeader, containerView, GridStyle, ModalStyle3} from '../../../constants/stylechung'
+import { containerHeader, containerView, GridStyle, ModalStyleThongbao} from '../../../constants/stylechung'
 import { NameScreen } from '../../../constants/NameScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, icons } from '../../../constants';
@@ -152,13 +152,13 @@ export const Notification = ({navigation,route}) => {
     }, [item, data]);
     //#endregion
 
-    //#region Xử lý selectedItem thay đổi
-    useEffect(() => {
-        if (selectedItem && selectedItem.length > 0) {
-            console.log('selectedItem: ',selectedItem);
-            clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao, true);
+    //#region Xử lý selectedItem thay đổi ---> Đang vướng vì nếu chọn lại đúng Item đó thì không có sự thay đổi item nên không vào useEffect này được.
+    /*useEffect(() => {
+        if (selectedItem) {
+            console.log('Dòng dữ liệu thông báo chọn: ',selectedItem);
+            //clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao, true);
         }
-    }, [selectedItem]);
+    }, [selectedItem]);*/
     //#endregion
 
     //#region Function Init
@@ -172,7 +172,7 @@ export const Notification = ({navigation,route}) => {
             fInitFilter(data,setFilters)
         }
     }
-        
+
     "Function Init Filter data = trống"
     function fInitFilter(data,setFilters){
         // Khởi tạo filters trống
@@ -298,37 +298,55 @@ export const Notification = ({navigation,route}) => {
         return (
             <Modal transparent visible={visibleThongBao} animationType="fade">
                 <TouchableWithoutFeedback onPress={() => setvisibleThongBao(false)}>
-                    <View style={ModalStyle3.overlay}>
-                    <View style={ModalStyle3.modalContainer}>
-                        <Text style={ModalStyle3.title}>{itemselect.TitleNotify?.toString()}</Text>
+                    <View style={ModalStyleThongbao.overlay}>
+                        <View style={ModalStyleThongbao.modalContainer}>
+                            <Text style={ModalStyleThongbao.title}>{itemselect.TitleNotify?.toString()}</Text>
 
-                        <View style={ModalStyle3.row}>
-                            <Text style={ModalStyle3.label}>Nội dung:</Text>
-                            <Text style={ModalStyle3.value}>{itemselect.MsgNotify?.toString()}</Text>
+                            <View style={ModalStyleThongbao.row}>
+                                <Text style={ModalStyleThongbao.label}>Nội dung:</Text>
+                                <Text style={ModalStyleThongbao.value}>{itemselect.MsgNotify?.toString()}</Text>  
+                            </View>
+
+                            <View style={ModalStyleThongbao.row}>
+                                <Text style={ModalStyleThongbao.label}>Thời gian:</Text>
+                                <Text style={ModalStyleThongbao.value}>{clsFunc.fFormatDataItem('EventsDate',itemselect)}</Text>
+                            </View>
+
+                            <View style={ModalStyleThongbao.row}>
+                                <Text style={ModalStyleThongbao.label}>Người thực hiện:</Text>
+                                <Text style={ModalStyleThongbao.value}>{itemselect.UserID?.toString()}</Text>
+                            </View>
+
+                            <View style={ModalStyleThongbao.row}>
+                                <Text style={ModalStyleThongbao.label}>Máy tính:</Text>
+                                <Text style={ModalStyleThongbao.value}>{itemselect.ComputerName?.toString()}</Text>
+                            </View>
+
+                            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+
+                                <TouchableOpacity style={ModalStyleThongbao.okButton} onPress={()=>{
+                                    setvisibleThongBao(false);
+                                    let data={ 
+                                        id: 'phieubanhang',
+                                        description: "PHIẾU\nBÁN HÀNG",
+                                        voucherID: itemselect.VoucherID
+                                    }
+                                    navigation.navigate(NameScreen.Phieubanhang,data);
+                                }}>
+                                    <Text style={ModalStyleThongbao.closeButtonText}>Phiếu bán hàng</Text>
+                                
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={ModalStyleThongbao.closeButton} onPress={()=>{
+                                    fHandleFilterChange(key,'');
+                                    clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,false);
+                                }}>
+                                    <Text style={ModalStyleThongbao.closeButtonText}>Đóng</Text>
+                                </TouchableOpacity>
+
+                                
+                            </View>
                         </View>
-
-                        <View style={ModalStyle3.row}>
-                            <Text style={ModalStyle3.label}>Thời gian:</Text>
-                            <Text style={ModalStyle3.value}>{clsFunc.fFormatDataItem('EventsDate',itemselect)}</Text>
-                        </View>
-
-                        <View style={ModalStyle3.row}>
-                            <Text style={ModalStyle3.label}>Người thực hiện:</Text>
-                            <Text style={ModalStyle3.value}>{itemselect.UserID?.toString()}</Text>
-                        </View>
-
-                        <View style={ModalStyle3.row}>
-                            <Text style={ModalStyle3.label}>Máy tính:</Text>
-                            <Text style={ModalStyle3.value}>{itemselect.ComputerName?.toString()}</Text>
-                        </View>
-
-                        <TouchableOpacity style={ModalStyle3.closeButton} onPress={()=>{
-                            fHandleFilterChange(key,'');
-                            clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,false);
-                        }}>
-                        <Text style={ModalStyle3.closeButtonText}>Đóng</Text>
-                        </TouchableOpacity>
-                    </View>
                     </View>
                 </TouchableWithoutFeedback>
             </Modal>
@@ -390,8 +408,9 @@ export const Notification = ({navigation,route}) => {
                                         <TouchableOpacity 
                                             style={{...GridStyle(visibleKeys.length,'').dataRow}} 
                                             onPress={()=>{
+                                                console.log('Dòng dữ liệu thông báo được chọn: ',item);
                                                 setSelectedItem(item);
-                                                clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,true);
+                                                clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao, true);
                                             }}
                                         >
                                             {keys.map(key => (
@@ -431,7 +450,6 @@ export const Notification = ({navigation,route}) => {
                         <ModalDetailThongBao 
                             visibleThongBao={visibleThongBao}
                             setvisibleThongBao={setvisibleThongBao}
-                            //itemselect={item!=null?selectedItem[0]:selectedItem}
                             itemselect={selectedItem[0]?selectedItem[0]:selectedItem}
                         />
                     :null}

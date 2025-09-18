@@ -349,5 +349,5 @@ export class clsFunc {
           return ''
       }
     }
-    
+
 }
