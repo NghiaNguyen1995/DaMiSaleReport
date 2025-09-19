@@ -706,6 +706,8 @@ export default function Report({navigation,route}) {
                             ]}
                             previousTitle="Trước"
                             nextTitle="Sau"
+                            selectMonthTitle="Chọn tháng"
+                            selectYearTitle="Chọn năm"
                             todayBackgroundColor={COLORS.yellow}
                             selectedDayColor="#66ff33"
                             selectedDayTextColor="#000"

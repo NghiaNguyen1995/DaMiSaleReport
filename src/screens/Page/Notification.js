@@ -339,7 +339,8 @@ export const Notification = ({navigation,route}) => {
 
                                 <TouchableOpacity style={ModalStyleThongbao.closeButton} onPress={()=>{
                                     fHandleFilterChange(key,'');
-                                    clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,false);
+                                    setvisibleThongBao(false);
+                                    //clsFunc.fSetTimeToOpenModalThongBao(setvisibleThongBao,false);
                                 }}>
                                     <Text style={ModalStyleThongbao.closeButtonText}>Đóng</Text>
                                 </TouchableOpacity>

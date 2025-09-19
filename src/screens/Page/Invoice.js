@@ -17,7 +17,7 @@ import { SalesManagerAPI } from '../../api/SalesManager';
 import { COLORS, icons } from '../../../constants';
 import { ViewLoadingAnimation } from '../Function/fViewLoading';
 import { clsFunc } from '../Function/Chung/fSupport';
-import { clsView } from '../Function/Chung/fView';
+
 
 export default function Invoice({navigation,route}) {
     
@@ -554,6 +554,8 @@ export default function Invoice({navigation,route}) {
                                 ]}
                                 previousTitle="Trước"
                                 nextTitle="Sau"
+                                selectMonthTitle="Chọn tháng"
+                                selectYearTitle="Chọn năm"
                                 todayBackgroundColor={COLORS.yellow}
                                 selectedDayColor="#66ff33"
                                 selectedDayTextColor="#000000"
