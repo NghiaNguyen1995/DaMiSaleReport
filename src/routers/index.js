@@ -20,7 +20,6 @@ import { clsSignalRService } from '../screens/Function/Chung/fSignalRService';
 const Stack = createStackNavigator();
 
 const Routers = () => {
-
   
   useEffect(() => {
       clsPushNotification.configureNotification();

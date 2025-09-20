@@ -22,15 +22,16 @@ export class clsPushNotification {
             voucherID,
           };
 
-          if (notification.userInteraction) {
-            if (navigationRef.current?.isReady()) {
-              console.log('➡️ Navigate on Android:', navData);
-              navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
-            } else {
-              clsPushNotification.initialNotification = { navData };
-            }
+          // 🚀 Luôn navigate (foreground + background)
+          if (navigationRef.current?.isReady()) {
+            console.log('➡️ Navigate on Android:', navData);
+            navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
           } else {
-            // foreground → hiển thị local notification
+            clsPushNotification.initialNotification = { navData };
+          }
+
+          // Nếu foreground thì hiện thêm local notification
+          if (!notification.userInteraction) {
             PushNotification.localNotification({
               channelId: 'DaMiSaleReport',
               title: notification.title || 'Thông báo',
@@ -62,7 +63,7 @@ export class clsPushNotification {
       // iOS config
       const onNotification = (notification) => {
         const data = notification.getData?.() || notification.data || {};
-        const { rowUniqueID, voucherID, userInteraction } = data;
+        const { rowUniqueID, voucherID } = data;
 
         const navData = {
           id: 'phieubanhang',
@@ -73,22 +74,23 @@ export class clsPushNotification {
 
         console.log('🔔 iOS notification:', data);
 
-        if (userInteraction) {
-          if (navigationRef.current?.isReady()) {
-            console.log('➡️ Navigate on iOS:', navData);
-            navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
-          } else {
-            clsPushNotification.initialNotification = { navData };
-          }
+        // 🚀 Luôn navigate
+        if (navigationRef.current?.isReady()) {
+          console.log('➡️ Navigate on iOS:', navData);
+          navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
         } else {
-          // foreground → hiển thị local notification
+          clsPushNotification.initialNotification = { navData };
+        }
+
+        // Nếu foreground thì hiện thêm local notification
+        if (!data.userInteraction) {
           PushNotificationIOS.addNotificationRequest({
             id: `${Date.now()}`,
             title: notification.getTitle?.() || 'Thông báo',
             body: notification.getMessage?.() || '',
             userInfo: {
               ...data,
-              userInteraction: true, // để nhận biết click
+              userInteraction: true, // để click tiếp vẫn navigate được
             },
             sound: 'default',
           });
