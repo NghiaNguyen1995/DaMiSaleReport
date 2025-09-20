@@ -1,5 +1,5 @@
 // src/routers/index.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { navigationRef } from '../../RootNavigation';
@@ -14,24 +14,24 @@ import Invoice from '../screens/Page/Invoice';
 import SetupUrl from '../screens/Page/Setupurl';
 import Notification from '../screens/Page/Notification';
 import { NameScreen } from '../../constants/NameScreen';
-import { clsSignalRService } from '../screens/Function/Chung/fSignalRService';
 
 
 const Stack = createStackNavigator();
 
 const Routers = () => {
   
-  useEffect(() => {
-      clsPushNotification.configureNotification();
-      clsSignalRService.startConnection();
-    }, []);
   const onNavigationReady = () => {
     console.log('✅ Navigation is ready');
     clsPushNotification.handleInitialNotificationAfterNavReady();
   };
-
+  
   return (
-    <NavigationContainer ref={navigationRef} onReady={onNavigationReady}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        onNavigationReady()
+      }}
+    >
       <Stack.Navigator initialRouteName={NameScreen.Login} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={NameScreen.Login} component={Login} />
         <Stack.Screen name={NameScreen.Regist} component={Regist} />

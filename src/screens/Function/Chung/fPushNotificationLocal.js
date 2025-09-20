@@ -1,15 +1,16 @@
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { NameScreen } from '../../../../constants/NameScreen';
 import { navigationRef } from '../../../../RootNavigation';
 
 export class clsPushNotification {
   static initialNotification = null;
 
+  // ⚙️ Cấu hình notification
   static configureNotification = () => {
     if (Platform.OS === 'android') {
-      // Android config
+      // ✅ Android config
       PushNotification.configure({
         onNotification: function (notification) {
           console.log('📩 Android notification:', notification);
@@ -22,7 +23,7 @@ export class clsPushNotification {
             voucherID,
           };
 
-          // 🚀 Luôn navigate (foreground + background)
+          // 🔀 Điều hướng luôn nếu navigation sẵn sàng
           if (navigationRef.current?.isReady()) {
             console.log('➡️ Navigate on Android:', navData);
             navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
@@ -30,7 +31,7 @@ export class clsPushNotification {
             clsPushNotification.initialNotification = { navData };
           }
 
-          // Nếu foreground thì hiện thêm local notification
+          // 👉 Nếu notification đến khi đang foreground → hiện local notification
           if (!notification.userInteraction) {
             PushNotification.localNotification({
               channelId: 'DaMiSaleReport',
@@ -48,7 +49,7 @@ export class clsPushNotification {
         requestPermissions: true,
       });
 
-      // Tạo channel Android (>= 8.0)
+      // 🔔 Tạo notification channel Android
       PushNotification.createChannel(
         {
           channelId: 'DaMiSaleReport',
@@ -60,7 +61,8 @@ export class clsPushNotification {
         (created) => console.log('✅ Android channel created:', created)
       );
     } else {
-      // iOS config
+      // ✅ iOS config
+
       const onNotification = (notification) => {
         const data = notification.getData?.() || notification.data || {};
         const { rowUniqueID, voucherID } = data;
@@ -72,17 +74,14 @@ export class clsPushNotification {
           voucherID,
         };
 
-        console.log('🔔 iOS notification:', data);
-
-        // 🚀 Luôn navigate
+        console.log('🔔 iOS push notification:', data);
         if (navigationRef.current?.isReady()) {
-          console.log('➡️ Navigate on iOS:', navData);
           navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
         } else {
           clsPushNotification.initialNotification = { navData };
         }
 
-        // Nếu foreground thì hiện thêm local notification
+        // Nếu foreground, hiển thị local notification
         if (!data.userInteraction) {
           PushNotificationIOS.addNotificationRequest({
             id: `${Date.now()}`,
@@ -90,26 +89,48 @@ export class clsPushNotification {
             body: notification.getMessage?.() || '',
             userInfo: {
               ...data,
-              userInteraction: true, // để click tiếp vẫn navigate được
+              userInteraction: true,
             },
             sound: 'default',
           });
         }
       };
 
-      // Lắng nghe event iOS
-      PushNotificationIOS.addEventListener('notification', onNotification);
+      const localNotification = (notification) => {
+        const data = notification.getData?.() || notification.userInfo || {};
+        const { rowUniqueID, voucherID } = data;
 
-      // Xin quyền iOS
+        const navData = {
+          id: 'phieubanhang',
+          description: 'PHIẾU\nBÁN HÀNG',
+          rowUniqueID,
+          voucherID,
+        };
+
+        console.log('👆 User tapped local notification (iOS)', navData);
+        if(navigationRef.current?.isReady()) {
+          navigationRef.current.navigate(NameScreen.Phieubanhang, navData);
+        } else {
+          clsPushNotification.initialNotification = { navData };
+        }
+      };
+
+      // 🔁 Đăng ký listener (không phụ thuộc AppState)
+      PushNotificationIOS.addEventListener('notification', onNotification);
+      PushNotificationIOS.addEventListener('localNotification', localNotification);
+
+      // 🛑 Xin quyền iOS
       PushNotificationIOS.requestPermissions().then((res) =>
         console.log('✅ iOS permissions:', res)
       );
     }
   };
 
+  // 📦 Xử lý notification khi app khởi động (đã bị kill)
   static handleInitialNotificationAfterNavReady = async () => {
+    console.log("✅ Navigation ready");
+
     if (Platform.OS === 'ios') {
-      // Lấy notification đã bấm khi app bị kill
       const notification = await PushNotificationIOS.getInitialNotification();
 
       if (notification) {
@@ -127,7 +148,7 @@ export class clsPushNotification {
       }
     }
 
-    // Trường hợp navigation chưa sẵn sàng
+    // ⏳ Nếu đã lưu navData nhưng navigation chưa sẵn sàng khi nhận notification
     if (clsPushNotification.initialNotification && navigationRef.current?.isReady()) {
       console.log('➡️ Navigate from saved notification');
       navigationRef.current.navigate(
@@ -138,6 +159,7 @@ export class clsPushNotification {
     }
   };
 
+  // 🚨 Hiển thị local notification (tự tạo)
   static showLocalNotification = (title, message) => {
     if (Platform.OS === 'android') {
       PushNotification.localNotification({
@@ -151,14 +173,16 @@ export class clsPushNotification {
         vibrate: true,
       });
     } else {
+      const userInfo = {
+        ...message,
+        userInteraction: false,
+      };
+
       PushNotificationIOS.addNotificationRequest({
         id: `${Date.now()}`,
         title: title,
         body: message.message,
-        userInfo: {
-          ...message,
-          userInteraction: true,
-        },
+        userInfo: userInfo,
         sound: 'default',
       });
     }

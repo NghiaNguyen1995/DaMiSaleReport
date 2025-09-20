@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     // Set delegate notification center để xử lý notification foreground
     UNUserNotificationCenter.current().delegate = self
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -37,15 +38,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
  
 }
 
-// MARK: - Notification Delegate
 extension AppDelegate: UNUserNotificationCenterDelegate {
+  // Khi notification đến trong foreground, hiển thị banner + sound + badge
   func userNotificationCenter(_ center: UNUserNotificationCenter,
                               willPresent notification: UNNotification,
                               withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    // ✅ Cho phép hiển thị notification khi foreground
     completionHandler([.banner, .sound, .badge])
   }
 }
+
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()
@@ -59,5 +60,4 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #endif
   }
 }
-
 

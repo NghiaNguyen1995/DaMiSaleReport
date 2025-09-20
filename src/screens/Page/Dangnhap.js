@@ -28,6 +28,7 @@ import { Modal } from 'react-native-paper';
 import { clsFunc } from '../Function/Chung/fSupport';
 import { clsSignalRService } from '../Function/Chung/fSignalRService';
 import { clsPushNotification } from '../Function/Chung/fPushNotificationLocal';
+import { useNotifeeNotification } from '../Function/Chung/useNotifeeNotification';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -49,6 +50,8 @@ export default function Login({ navigation }) {
     const [loaithongbao,setloaithongbao] = useState('');
 
     const [visileLoad,setvisileLoad]= useState(false);
+
+    useNotifeeNotification({navigation})
 
     useEffect(() => {
 
